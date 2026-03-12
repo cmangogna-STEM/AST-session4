@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 2.3 — Design a Must-Have Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--deep:#1B3A4B;--teal:#2E6B7A;--sage:#5E8A6E;--gold:#D4894A;--rust:#B25C3A;--cream:#FBF8F2;--lt-teal:#E8F2F5;--lt-gold:#FDF3E9;--white:#fff;--dark:#1A2830;--muted:#7a8a90;--lt-sage:#A8C5B0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--deep);min-height:100vh;color:var(--white);}
+
+  .header{padding:28px 40px 20px;border-bottom:3px solid var(--sage);}
+  .block-tag{display:inline-block;background:var(--sage);color:var(--white);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:10px;}
+  .header h1{font-family:'Fraunces',serif;font-size:26px;font-weight:900;margin-bottom:4px;}
+  .header p{color:var(--lt-sage);font-size:14px;}
+  .time-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(94,138,110,0.2);border:1px solid rgba(94,138,110,0.4);color:var(--lt-sage);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:8px;}
+
+  .main{max-width:860px;margin:0 auto;padding:32px 40px;}
+
+  /* Timer */
+  .timer-display{display:flex;align-items:center;justify-content:center;gap:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;margin-bottom:28px;}
+  .timer-num{font-family:'Fraunces',serif;font-size:56px;font-weight:900;color:var(--gold);line-height:1;}
+  .timer-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .timer-btn{background:var(--gold);color:var(--dark);border:none;border-radius:8px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.15s;}
+  .timer-btn:hover{transform:scale(1.05);}
+  .timer-btn.running{background:var(--rust);}
+
+  /* Phenomenon selector */
+  .phenom-section{margin-bottom:24px;}
+  .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;}
+  .phenom-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+  .phenom-chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:8px 16px;font-size:13px;cursor:pointer;transition:all 0.2s;color:rgba(255,255,255,0.7);}
+  .phenom-chip:hover,.phenom-chip.active{background:var(--teal);border-color:var(--teal);color:var(--white);}
+  .phenom-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px 16px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+  .phenom-input:focus{border-color:var(--teal);}
+  .phenom-input::placeholder{color:rgba(255,255,255,0.3);}
+
+  /* Checklist builder */
+  .builder{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px 28px;margin-bottom:24px;}
+  .builder-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:6px;}
+  .builder-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+
+  .item-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;animation:fadeUp 0.3s ease both;}
+  .item-num{width:28px;height:28px;border-radius:8px;background:var(--teal);color:var(--white);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:8px;}
+  .item-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;resize:none;transition:border-color 0.2s;min-height:44px;}
+  .item-input:focus{border-color:var(--sage);}
+  .item-input::placeholder{color:rgba(255,255,255,0.25);}
+  .item-del{background:rgba(178,92,58,0.2);border:1px solid rgba(178,92,58,0.3);border-radius:6px;padding:8px 10px;color:rgba(178,92,58,0.8);cursor:pointer;transition:all 0.15s;font-size:14px;margin-top:6px;}
+  .item-del:hover{background:rgba(178,92,58,0.35);}
+
+  .validator{font-size:12px;padding:4px 10px;border-radius:12px;margin-top:4px;display:inline-block;}
+  .validator.word{background:rgba(178,92,58,0.2);color:#f5a07a;}
+  .validator.statement{background:rgba(94,138,110,0.2);color:var(--lt-sage);}
+
+  .add-btn{background:rgba(46,107,122,0.2);border:1px dashed rgba(46,107,122,0.5);border-radius:8px;padding:10px 20px;color:var(--teal);font-weight:600;font-size:14px;cursor:pointer;width:100%;margin-top:8px;transition:all 0.2s;}
+  .add-btn:hover{background:rgba(46,107,122,0.3);}
+
+  /* Criteria rubric */
+  .rubric{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+  .rubric-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.2s;}
+  .rubric-item:hover{background:rgba(255,255,255,0.07);}
+  .rubric-item.met{border-color:var(--sage);background:rgba(94,138,110,0.12);}
+  .rubric-item.unmet{border-color:var(--rust);background:rgba(178,92,58,0.08);}
+  .rubric-check{font-size:18px;margin-bottom:6px;}
+  .rubric-text{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.4;}
+
+  /* Preview */
+  .preview{background:var(--white);border-radius:16px;padding:24px 28px;color:var(--dark);}
+  .preview-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--deep);margin-bottom:4px;}
+  .preview-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+  .preview-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #eee;}
+  .preview-item:last-child{border-bottom:none;}
+  .preview-box{width:18px;height:18px;border:2px solid var(--sage);border-radius:4px;flex-shrink:0;margin-top:2px;}
+  .preview-text{font-size:14px;color:var(--dark);line-height:1.4;}
+
+  .share-btn{background:var(--gold);color:var(--dark);font-family:'Fraunces',serif;font-size:16px;font-weight:700;border:none;border-radius:10px;padding:13px 32px;cursor:pointer;display:block;margin:20px auto 0;transition:all 0.2s;}
+  .share-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,137,74,0.35);}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{padding:9px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.55);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:var(--sage);border-color:var(--sage);color:var(--white);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadeUp 0.3s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="block-tag">Block 2 · Activity 2.3</div>
+  <h1>Design Your Own Must-Have Checklist</h1>
+  <p>3-minute design sprint — then share your best item in chat</p>
+  <div class="time-badge">⏱ 5 minutes &nbsp;·&nbsp; Quick Design Task</div>
+</div>
+
+<div class="main">
+  <!-- Timer -->
+  <div class="timer-display">
+    <div>
+      <div class="timer-num" id="timer-num">3:00</div>
+      <div class="timer-label">Minutes to Design</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="timer-btn" id="timer-btn" onclick="toggleTimer()">▶ Start Timer</button>
+      <button class="timer-btn" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);" onclick="resetTimer()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('build',this)">🛠 Build</div>
+    <div class="tab" onclick="switchTab('criteria',this)">✅ Check Criteria</div>
+    <div class="tab" onclick="switchTab('preview',this)">👁 Preview</div>
+  </div>
+
+  <!-- BUILD -->
+  <div class="tab-panel active" id="tab-build">
+    <div class="phenom-section">
+      <div class="section-label">Choose your phenomenon</div>
+      <div class="phenom-chips">
+        <div class="phenom-chip" onclick="selectPhenom(this,'Why do some puddles dry up faster than others?')">Why do some puddles dry up faster?</div>
+        <div class="phenom-chip" onclick="selectPhenom(this,'Why are some neighborhoods in our city hotter in summer?')">Urban heat island</div>
+        <div class="phenom-chip" onclick="selectPhenom(this,'Why do some trees change color before others in fall?')">Seasonal tree change</div>
+        <div class="phenom-chip" onclick="selectPhenom(this,'How does sound travel underwater?')">Sound underwater</div>
+      </div>
+      <input class="phenom-input" id="phenom-custom" placeholder="Or type your own phenomenon from your placement...">
+    </div>
+
+    <div class="builder">
+      <div class="builder-title">Build Your Checklist</div>
+      <div class="builder-sub">Each item should be a <strong>STATEMENT about a relationship</strong>, not a vocabulary word.<br>Example ✗: "Evaporation" &nbsp;&nbsp; Example ✓: "I explain how heat causes water particles to move into the air"</div>
+      <div id="items-container"></div>
+      <button class="add-btn" onclick="addItem()">+ Add another item</button>
+    </div>
+  </div>
+
+  <!-- CRITERIA -->
+  <div class="tab-panel" id="tab-criteria">
+    <div class="section-label">Self-Check: Does your checklist meet these criteria?</div>
+    <div class="rubric">
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">Items are <strong>relational statements</strong>, not single vocabulary words</div>
+      </div>
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">At least one item asks for <strong>community or personal connection</strong></div>
+      </div>
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">At least one item requires <strong>specific evidence</strong> from the investigation</div>
+      </div>
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">Items could be shown through <strong>drawing or gesture</strong>, not just writing</div>
+      </div>
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">Students could co-create this list — items come from <strong>their language</strong></div>
+      </div>
+      <div class="rubric-item" onclick="toggleRubric(this)">
+        <div class="rubric-check">○</div>
+        <div class="rubric-text">3–5 items maximum — <strong>not overwhelming</strong></div>
+      </div>
+    </div>
+    <div style="background:rgba(212,137,74,0.12);border:1px solid rgba(212,137,74,0.3);border-radius:12px;padding:16px 20px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Discussion Prompt</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.8);font-style:italic;line-height:1.5;">"How would you co-create this WITH students rather than delivering it to them? What would that process look like in your grade level?"</div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="tab-panel" id="tab-preview">
+    <div class="section-label">Student View — How it will look</div>
+    <div class="preview" id="preview-card">
+      <div class="preview-title" id="prev-title">Urban Heat Island — Must-Have Checklist</div>
+      <div class="preview-sub">Check each item as you complete your explanation</div>
+      <div id="prev-items"><div style="color:var(--muted);font-size:14px;font-style:italic;padding:20px 0;">Add items in the Build tab to see your preview...</div></div>
+    </div>
+    <button class="share-btn" onclick="shareItem()">Share My Best Item in Chat 💬</button>
+  </div>
+</div>
+
+<script>
+let items = [];
+let timerInterval = null;
+let seconds = 180;
+let running = false;
+
+function addItem() {
+  const id = Date.now();
+  items.push({ id, text: '' });
+  renderItems();
+  // focus new input
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.item-input');
+    inputs[inputs.length-1].focus();
+  }, 50);
+}
+
+function removeItem(id) {
+  items = items.filter(i => i.id !== id);
+  renderItems();
+}
+
+function updateItem(id, val) {
+  const item = items.find(i => i.id === id);
+  if (item) item.text = val;
+  updatePreview();
+  validateItem(id, val);
+}
+
+function validateItem(id, text) {
+  const validator = document.getElementById('val-' + id);
+  if (!validator) return;
+  const wordCount = text.trim().split(/\s+/).length;
+  if (text.trim() === '') { validator.textContent = ''; return; }
+  if (wordCount <= 2) {
+    validator.textContent = '⚠ Might be too short — is this a word or a statement?';
+    validator.className = 'validator word';
+  } else if (text.toLowerCase().startsWith('i ') || text.toLowerCase().includes(' how ') || text.toLowerCase().includes(' why ') || text.toLowerCase().includes(' explain')) {
+    validator.textContent = '✓ Looks like a relational statement!';
+    validator.className = 'validator statement';
+  } else {
+    validator.textContent = '💡 Tip: Try starting with "I explain how..." or "I connect..."';
+    validator.className = 'validator word';
+  }
+}
+
+function renderItems() {
+  const container = document.getElementById('items-container');
+  if (!items.length) {
+    container.innerHTML = '';
+    addItem();
+    return;
+  }
+  container.innerHTML = items.map((item, i) => `
+    <div class="item-row">
+      <div class="item-num">${i+1}</div>
+      <div style="flex:1;">
+        <textarea class="item-input" placeholder="I explain how... / I connect... / I use evidence from..." onkeyup="updateItem(${item.id}, this.value)">${item.text}</textarea>
+        <div id="val-${item.id}" class="validator"></div>
+      </div>
+      ${items.length > 1 ? `<button class="item-del" onclick="removeItem(${item.id})">✕</button>` : ''}
+    </div>
+  `).join('');
+  updatePreview();
+}
+
+function updatePreview() {
+  const phenomCustom = document.getElementById('phenom-custom').value;
+  const phenomActive = document.querySelector('.phenom-chip.active');
+  const phenom = phenomCustom || (phenomActive ? phenomActive.textContent : 'Your Phenomenon');
+  document.getElementById('prev-title').textContent = phenom + ' — Must-Have Checklist';
+  const prevItems = document.getElementById('prev-items');
+  const filled = items.filter(i => i.text.trim());
+  if (!filled.length) {
+    prevItems.innerHTML = '<div style="color:var(--muted);font-size:14px;font-style:italic;padding:20px 0;">Add items in the Build tab to see your preview...</div>';
+  } else {
+    prevItems.innerHTML = filled.map(i => `
+      <div class="preview-item">
+        <div class="preview-box"></div>
+        <div class="preview-text">${i.text}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function selectPhenom(el, val) {
+  document.querySelectorAll('.phenom-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('phenom-custom').value = '';
+  updatePreview();
+}
+
+function toggleRubric(el) {
+  const ismet = el.classList.toggle('met');
+  el.querySelector('.rubric-check').textContent = ismet ? '✓' : '○';
+  if (!ismet) el.classList.remove('unmet');
+}
+
+function toggleTimer() {
+  if (running) {
+    clearInterval(timerInterval);
+    document.getElementById('timer-btn').textContent = '▶ Resume';
+    document.getElementById('timer-btn').classList.remove('running');
+    running = false;
+  } else {
+    document.getElementById('timer-btn').textContent = '⏸ Pause';
+    document.getElementById('timer-btn').classList.add('running');
+    running = true;
+    timerInterval = setInterval(() => {
+      seconds--;
+      const m = Math.floor(seconds/60);
+      const s = seconds % 60;
+      document.getElementById('timer-num').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (seconds <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timer-num').textContent = '0:00';
+        document.getElementById('timer-btn').textContent = '✓ Time\'s up!';
+        document.getElementById('timer-btn').style.background = 'var(--sage)';
+        running = false;
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  seconds = 180;
+  running = false;
+  document.getElementById('timer-num').textContent = '3:00';
+  document.getElementById('timer-btn').textContent = '▶ Start Timer';
+  document.getElementById('timer-btn').classList.remove('running');
+  document.getElementById('timer-btn').style.background = '';
+}
+
+function shareItem() {
+  const best = items.filter(i=>i.text.trim()).sort((a,b)=>b.text.length-a.text.length)[0];
+  if (!best) { alert('Add at least one item first!'); return; }
+  const dummy = document.createElement('textarea');
+  dummy.value = `My best Must-Have item: "${best.text}"`;
+  document.body.appendChild(dummy);
+  dummy.select();
+  document.execCommand('copy');
+  document.body.removeChild(dummy);
+  event.target.textContent = '✓ Copied to clipboard — paste in Zoom chat!';
+  event.target.style.background = 'var(--sage)';
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab,.tab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'preview') updatePreview();
+}
+
+// Init
+addItem();
+</script>
+</body>
+</html>

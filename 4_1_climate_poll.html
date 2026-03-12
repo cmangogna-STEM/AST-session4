@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 4.1 — Climate Change: What Do We Know?</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Mulish:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #080e14; --night: #0e1820; --deep-sea: #122038;
+    --wave: #1a4a5e; --ocean: #2a7a9e; --sky: #4ab8d8; --ice: #a0dce8;
+    --flame: #e85820; --ember: #e89820; --sun: #f0c040;
+    --earth: #4a8a5e; --leaf: #7abf80;
+    --fog: #6a8090; --mist: #a0b8c0; --snow: #f0f4f8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--void); color: var(--snow); min-height: 100vh; overflow-x: hidden; }
+
+  /* Aurora-like background */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 10% 50%, rgba(26,74,94,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 10%, rgba(232,88,32,0.15) 0%, transparent 40%),
+      radial-gradient(ellipse at 60% 90%, rgba(74,138,94,0.1) 0%, transparent 40%);
+  }
+
+  .header { padding: 28px 40px 20px; border-bottom: 1px solid rgba(74,184,216,0.15); }
+  .tag-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tag { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; padding: 4px 13px; border-radius: 100px; }
+  .t-block { background: var(--flame); color: white; }
+  .t-justice { background: rgba(74,138,94,0.25); border: 1px solid rgba(122,191,128,0.4); color: var(--leaf); }
+  h1 { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+  .header-sub { color: var(--fog); font-size: 13px; }
+  .time-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,184,216,0.1); border: 1px solid rgba(74,184,216,0.2); color: var(--sky); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 100px; margin-top: 8px; }
+
+  .layout { display: grid; grid-template-columns: 1fr 420px; gap: 0; min-height: calc(100vh - 100px); }
+
+  /* Left: word cloud + input */
+  .left { padding: 28px 32px; border-right: 1px solid rgba(255,255,255,0.06); }
+  .input-area { margin-bottom: 28px; }
+  .prompt-box { background: rgba(26,74,94,0.3); border: 1px solid rgba(74,184,216,0.25); border-radius: 16px; padding: 20px 22px; margin-bottom: 16px; }
+  .prompt-text { font-family: 'Mulish', sans-serif; font-size: 16px; font-style: italic; color: var(--snow); line-height: 1.5; }
+  .input-row { display: flex; gap: 10px; }
+  .word-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 16px; color: var(--snow); font-family: 'Mulish', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .word-input:focus { border-color: var(--sky); }
+  .word-input::placeholder { color: rgba(255,255,255,0.25); }
+  .submit-word { background: var(--ocean); color: white; border: none; border-radius: 10px; padding: 12px 22px; font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .submit-word:hover { background: var(--sky); color: var(--void); }
+
+  /* Cloud */
+  .cloud-area { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; min-height: 220px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+  .cloud-word { border-radius: 20px; padding: 7px 16px; font-weight: 700; cursor: default; animation: floatIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both; transition: transform 0.2s; }
+  .cloud-word:hover { transform: scale(1.08); }
+  @keyframes floatIn { from{opacity:0;transform:scale(0.6);} to{opacity:1;transform:scale(1);} }
+  .cloud-empty { width: 100%; text-align: center; color: rgba(255,255,255,0.2); font-size: 14px; font-style: italic; padding: 40px 0; }
+
+  /* Right: 5-point framework */
+  .right { padding: 28px 28px; overflow-y: auto; }
+  .framework-title { font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700; color: var(--sky); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; }
+  .framework-note { font-size: 12px; color: var(--fog); margin-bottom: 20px; line-height: 1.5; }
+
+  .point-card { border-radius: 14px; overflow: hidden; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+  .point-card:hover { transform: translateX(4px); }
+  .point-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+  .point-num { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 900; width: 36px; text-align: center; flex-shrink: 0; }
+  .point-title { font-size: 14px; font-weight: 700; }
+  .point-body { padding: 12px 16px 14px 64px; font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; display: none; }
+  .point-card.open .point-body { display: block; animation: fadeUp 0.25s ease both; }
+  .point-courage { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 10px; }
+
+  .p1 .point-head { background: rgba(42,122,158,0.3); }
+  .p1 .point-num { color: var(--sky); }
+  .p1 .point-title { color: var(--ice); }
+  .p1 .point-body { background: rgba(42,122,158,0.1); }
+
+  .p2 .point-head { background: rgba(42,122,158,0.25); }
+  .p2 .point-num { color: #70c8d8; }
+  .p2 .point-title { color: #a0d8e0; }
+  .p2 .point-body { background: rgba(42,122,158,0.08); }
+
+  .p3 .point-head { background: rgba(232,88,32,0.25); }
+  .p3 .point-num { color: var(--ember); }
+  .p3 .point-title { color: #f0a070; }
+  .p3 .point-body { background: rgba(232,88,32,0.08); border: 1px solid rgba(232,88,32,0.2); }
+  .p3 .point-courage { color: var(--ember); }
+
+  .p4 .point-head { background: rgba(232,88,32,0.2); }
+  .p4 .point-num { color: var(--flame); }
+  .p4 .point-title { color: #e89080; }
+  .p4 .point-body { background: rgba(232,88,32,0.06); }
+
+  .p5 .point-head { background: rgba(74,138,94,0.25); }
+  .p5 .point-num { color: var(--leaf); }
+  .p5 .point-title { color: #a0d4a8; }
+  .p5 .point-body { background: rgba(74,138,94,0.08); }
+
+  /* Discussion prompts */
+  .disc-section { margin-top: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 20px; }
+  .disc-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--fog); margin-bottom: 12px; }
+  .dp { font-size: 13px; color: rgba(255,255,255,0.78); font-style: italic; line-height: 1.5; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .dp:last-child { border-bottom: none; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="tag-row">
+    <div class="tag t-block">Block 4 · Activity 4.1</div>
+    <div class="tag t-justice">⚖ Climate Justice</div>
+  </div>
+  <h1>Climate Change: What Do We Know?</h1>
+  <div class="header-sub">Quickfire word cloud + the 5 essential things elementary students should understand</div>
+  <div class="time-badge">⏱ 7 minutes</div>
+</div>
+
+<div class="layout">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="input-area">
+      <div class="prompt-box">
+        <div class="prompt-text">"What is ONE essential thing elementary students should understand about climate change?"</div>
+      </div>
+      <div class="input-row">
+        <input class="word-input" id="word-input" placeholder="Type a word or short phrase..." maxlength="40" onkeydown="if(event.key==='Enter')addWord()">
+        <button class="submit-word" onclick="addWord()">Add →</button>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--fog);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:12px;">Class Word Cloud</div>
+    <div class="cloud-area" id="cloud-area">
+      <div class="cloud-empty" id="cloud-empty">Responses will appear here...</div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center;">
+      <button onclick="loadSampleWords()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 18px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;">Load sample class responses (demo)</button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="framework-title">The 5 Essential Points</div>
+    <div class="framework-note">After seeing the word cloud — compare what the class emphasized vs. what's in this framework. Click each point to read more.</div>
+
+    <div class="point-card p1" onclick="this.classList.toggle('open')">
+      <div class="point-head">
+        <div class="point-num">1</div>
+        <div class="point-title">It's real</div>
+      </div>
+      <div class="point-body">Climate change is happening and the evidence is overwhelming — rising temperatures, sea level rise, shifting seasons, extreme weather events. This is not a debate in the scientific community.</div>
+    </div>
+
+    <div class="point-card p2" onclick="this.classList.toggle('open')">
+      <div class="point-head">
+        <div class="point-num">2</div>
+        <div class="point-title">It's happening now</div>
+      </div>
+      <div class="point-body">This is not a future problem. It's occurring in students' lifetimes, in their communities — changing where it floods, where it's hot, what animals live nearby, what food grows locally.</div>
+    </div>
+
+    <div class="point-card p3" onclick="this.classList.toggle('open')">
+      <div class="point-head">
+        <div class="point-num">3</div>
+        <div class="point-title">Humans are causing it</div>
+      </div>
+      <div class="point-body">
+        Burning fossil fuels is the primary cause — and this has been accelerated by colonialism, industrial capitalism, and structures that allow fossil fuels to dominate economic and political systems.
+        <div class="point-courage">⚠ This is the most politically courageous point to teach</div>
+        <br>Discussion: "What does it mean that climate change is 'maintained through white supremacy culture structures'? How do you teach that to 3rd graders?"
+      </div>
+    </div>
+
+    <div class="point-card p4" onclick="this.classList.toggle('open')">
+      <div class="point-head">
+        <div class="point-num">4</div>
+        <div class="point-title">It's urgent</div>
+      </div>
+      <div class="point-body">The window for meaningful action is closing. 84% of youth ages 16–25 are at least moderately worried about climate change (Hickman et al., 2021). Students are already feeling this urgency — we should not minimize it.</div>
+    </div>
+
+    <div class="point-card p5" onclick="this.classList.toggle('open')">
+      <div class="point-head">
+        <div class="point-num">5</div>
+        <div class="point-title">Solutions exist</div>
+      </div>
+      <div class="point-body">
+        This is the hope point — and it is discipline, not optimism. Mariame Kaba: "Hope is a discipline." Paulo Freire's "Esperançar." There are proven solutions at every scale. Student action can be real action.
+        <br><br>Resources: Project Drawdown · climategen.org · subjecttoclimate.org
+      </div>
+    </div>
+
+    <div class="disc-section">
+      <div class="disc-label">Discussion Prompts</div>
+      <div class="dp">"Which of the 5 points feels hardest to teach? Which do you think most elementary teachers skip — and why?"</div>
+      <div class="dp">"Look at our word cloud — which points are most represented? Which are missing?"</div>
+      <div class="dp">"Point 3 says climate change is 'maintained through white supremacy structures.' What does that mean for 3rd graders? What language would you use?"</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const words = [];
+const COLORS = [
+  { bg: 'rgba(42,122,158,0.3)', border: 'rgba(74,184,216,0.4)', color: '#a0dce8' },
+  { bg: 'rgba(232,88,32,0.25)', border: 'rgba(232,88,32,0.4)', color: '#f0a070' },
+  { bg: 'rgba(74,138,94,0.25)', border: 'rgba(122,191,128,0.4)', color: '#a0d4a8' },
+  { bg: 'rgba(240,192,64,0.2)', border: 'rgba(240,192,64,0.35)', color: '#f0c040' },
+  { bg: 'rgba(160,140,200,0.2)', border: 'rgba(180,160,220,0.35)', color: '#c0b0e0' },
+];
+const SIZES = [13,14,15,16,18,20];
+
+function addWord() {
+  const input = document.getElementById('word-input');
+  const w = input.value.trim();
+  if (!w) return;
+  words.push(w);
+  input.value = '';
+  renderCloud();
+}
+
+function renderCloud() {
+  const area = document.getElementById('cloud-area');
+  const empty = document.getElementById('cloud-empty');
+  if (empty) empty.style.display = 'none';
+  const last = words[words.length-1];
+  const col = COLORS[words.length % COLORS.length];
+  const size = SIZES[Math.floor(Math.random() * SIZES.length)];
+  const chip = document.createElement('div');
+  chip.className = 'cloud-word';
+  chip.textContent = last;
+  chip.style.cssText = `background:${col.bg};border:1px solid ${col.border};color:${col.color};font-size:${size}px;`;
+  area.appendChild(chip);
+}
+
+function loadSampleWords() {
+  const samples = ['Carbon emissions','Real and urgent','Solutions exist','Human-caused','Biodiversity','Sea level rise','Youth action','Environmental justice','Indigenous knowledge','Systems change','Fossil fuels','Hope','It\'s happening now','Equity','Local impacts'];
+  samples.forEach((w,i) => { setTimeout(() => { words.push(w); renderCloud(); }, i*80); });
+}
+</script>
+</body>
+</html>

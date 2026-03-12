@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 5.1 — Backwards Design ↔ AST Mapping</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0f18; --surface: #131824; --card: #1a2232; --raised: #202a40;
+    --indigo: #2a3a7e; --blue: #3a62c8; --sky: #5a9ae8; --ice: #a0c8f8;
+    --gold: #d4a040; --amber: #e8c060; --sun: #f8e080;
+    --sage: #4a8a60; --leaf: #70b880; --lt-leaf: #a0d4b0;
+    --rust: #b84030; --terracotta: #d46050;
+    --fog: #606878; --mist: #9aa8b8; --snow: #ecf0f8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--snow); min-height: 100vh; }
+
+  /* Constellation background */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 30% 20%, rgba(42,58,126,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(42,138,96,0.1) 0%, transparent 45%);
+  }
+
+  .header { background: var(--surface); border-bottom: 1px solid rgba(90,154,232,0.2); padding: 22px 40px; display: flex; align-items: flex-start; justify-content: space-between; }
+  .tag-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .t1 { background: var(--indigo); color: var(--sky); }
+  .t2 { background: rgba(74,138,96,0.2); border: 1px solid rgba(112,184,128,0.4); color: var(--leaf); }
+  h1 { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+  .header-sub { color: var(--fog); font-size: 13px; }
+  .time-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(90,154,232,0.1); border: 1px solid rgba(90,154,232,0.2); color: var(--sky); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 100px; margin-top: 8px; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 28px 40px; }
+
+  /* Jigsaw assignment */
+  .assignment-banner { background: rgba(212,160,64,0.1); border: 1px solid rgba(212,160,64,0.3); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; }
+  .assignment-icon { font-size: 28px; }
+  .assignment-text { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.55; }
+  .assignment-text strong { color: var(--amber); }
+
+  .your-row-selector { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .row-btn { padding: 9px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .row-btn.active { background: var(--indigo); border-color: var(--blue); color: var(--ice); }
+
+  /* Main mapping table */
+  .table-wrap { overflow-x: auto; margin-bottom: 28px; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  th { background: var(--card); padding: 14px 16px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); border-bottom: 2px solid rgba(255,255,255,0.08); text-align: left; }
+  th:first-child { width: 200px; }
+  th:nth-child(2) { color: var(--sky); }
+  th:nth-child(3) { color: var(--leaf); }
+  th:nth-child(4) { color: var(--amber); }
+  th:nth-child(5) { color: var(--terracotta); }
+
+  tr.data-row { cursor: pointer; transition: background 0.15s; }
+  tr.data-row:hover td { background: rgba(255,255,255,0.03); }
+  tr.data-row.mine td { background: rgba(42,58,126,0.2); }
+  tr.data-row.mine td:first-child { border-left: 3px solid var(--blue); }
+
+  td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; line-height: 1.5; vertical-align: top; }
+  td:first-child { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--mist); }
+  .bd-element { color: var(--ice); font-size: 13px; }
+  .bd-desc { font-size: 12px; color: var(--fog); margin-top: 3px; }
+  .ast-element { color: var(--lt-leaf); }
+  .ast-desc { font-size: 12px; color: var(--fog); margin-top: 3px; }
+  .orca-example { color: var(--amber); font-style: italic; font-size: 12px; }
+  .my-example-cell { }
+
+  .example-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: var(--snow); font-family: 'Space Grotesk', sans-serif; font-size: 12px; resize: none; outline: none; min-height: 70px; line-height: 1.4; transition: border-color 0.2s; }
+  .example-input:focus { border-color: var(--blue); }
+  .example-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+
+  /* Key insight box */
+  .key-insight { background: rgba(90,154,232,0.08); border: 1px solid rgba(90,154,232,0.2); border-radius: 14px; padding: 20px 24px; margin-bottom: 24px; }
+  .ki-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--sky); margin-bottom: 10px; }
+  .ki-text { font-family: 'Lora', serif; font-size: 15px; color: rgba(255,255,255,0.88); line-height: 1.65; font-style: italic; }
+
+  /* Discussion prompts */
+  .disc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dp { border-radius: 12px; padding: 14px 18px; }
+  .dp-1 { background: rgba(42,58,126,0.2); border: 1px solid rgba(90,154,232,0.2); }
+  .dp-2 { background: rgba(74,138,96,0.15); border: 1px solid rgba(112,184,128,0.2); }
+  .dp-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .dp-1 .dp-label { color: var(--sky); }
+  .dp-2 .dp-label { color: var(--leaf); }
+  .dp-text { font-size: 13px; color: rgba(255,255,255,0.8); font-style: italic; line-height: 1.5; }
+
+  .section-label { font-size: 11px; font-weight: 700; color: var(--fog); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="tag-row">
+      <div class="tag t1">Block 5 · Activity 5.1</div>
+      <div class="tag t2">Jigsaw Analysis</div>
+    </div>
+    <h1>Backwards Design ↔ AST: Mapping Table</h1>
+    <div class="header-sub">Each participant owns one row — find your example, add it, then we read across together</div>
+    <div class="time-badge">⏱ 12 minutes · Collaborative Doc + Discussion</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="assignment-banner">
+    <div class="assignment-icon">🧩</div>
+    <div class="assignment-text">
+      <strong>Jigsaw Instructions:</strong> The facilitator will assign you ONE row below. You have 4 minutes to: (1) read your row, (2) find ONE example from your placement or from the Orca Sound unit, and (3) type it in the "Your Example" column. Then we read across the whole table together.
+    </div>
+  </div>
+
+  <div class="section-label">Select your assigned row</div>
+  <div class="your-row-selector">
+    <button class="row-btn active" onclick="selectRow(0,this)">Row 1 — Enduring Understanding</button>
+    <button class="row-btn" onclick="selectRow(1,this)">Row 2 — Essential Questions</button>
+    <button class="row-btn" onclick="selectRow(2,this)">Row 3 — Evidence of Learning</button>
+    <button class="row-btn" onclick="selectRow(3,this)">Row 4 — Learning Plan</button>
+    <button class="row-btn" onclick="selectRow(4,this)">Row 5 — Transfer Goals</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>BD Stage</th>
+          <th>Backwards Design Element</th>
+          <th>AST Connection</th>
+          <th>Orca Sound Unit Example</th>
+          <th>Your Example (add yours!)</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="key-insight">
+    <div class="ki-label">Key Insight to Land Together</div>
+    <div class="ki-text">"Backwards Design asks: <em>What do we want students to understand, and how will we know?</em> AST adds: <em>And how will students BUILD that understanding through doing science?</em> They're not separate frameworks — they're the same question asked from different angles."</div>
+  </div>
+
+  <div class="section-label">Discussion Prompts</div>
+  <div class="disc-grid">
+    <div class="dp dp-1">
+      <div class="dp-label">Transfer & Justice</div>
+      <div class="dp-text">"Row 5 maps 'Transfer Goals' to 'Justice & Agency.' What does it mean for 4th graders to TRANSFER their learning? What would that look like outside the classroom?"</div>
+    </div>
+    <div class="dp dp-2">
+      <div class="dp-label">Evidence & Equity</div>
+      <div class="dp-text">"In Stage 2 of Backwards Design, you determine 'acceptable evidence.' What counts as acceptable evidence in a justice-centered classroom? Who decides?"</div>
+    </div>
+    <div class="dp dp-1">
+      <div class="dp-label">Not Separate Frameworks</div>
+      <div class="dp-text">"Before today, did you think of Backwards Design and AST as separate things? What's the most useful insight from seeing them mapped together?"</div>
+    </div>
+    <div class="dp dp-2">
+      <div class="dp-label">Your Placement</div>
+      <div class="dp-text">"Looking at your example — which stage of Backwards Design is clearest in the teaching you've observed? Which is least visible?"</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROWS = [
+  {
+    label: "Enduring Understanding",
+    bd: { main: "Desired Results / Enduring Understandings", desc: "What should students understand, know, and be able to do? What big ideas endure beyond the unit?" },
+    ast: { main: "Anchoring Phenomenon (Stage 1)", desc: "The phenomenon IS the enduring understanding — it makes the big idea tangible, puzzling, and connected to students' lives" },
+    orca: "Sound energy can disrupt communication and behavior in marine ecosystems — and human decisions create and perpetuate this problem",
+    placeholder: "What's the enduring understanding of a unit you've observed in your placement? Or design one: what should a student still understand 5 years from now?"
+  },
+  {
+    label: "Essential Questions",
+    bd: { main: "Essential Questions", desc: "Open-ended questions that get at the heart of the discipline — students should be able to answer them with increasing sophistication over time" },
+    ast: { main: "Stage 2: Eliciting Student Ideas", desc: "Students' own questions ARE the essential questions — elicitation reveals what students genuinely wonder, which shapes the unit's direction" },
+    orca: "Why can't the orca find enough food? What is interfering with her ability to hunt? Who or what is responsible?",
+    placeholder: "Find or write one essential question from a unit you've seen. Is it a question students could have generated, or only a teacher?"
+  },
+  {
+    label: "Evidence of Learning",
+    bd: { main: "Assessment Evidence", desc: "What would count as acceptable evidence that students have achieved the desired results? Performance tasks, quizzes, observations?" },
+    ast: { main: "Stage 4: CER Explanation (Pressing for Explanation)", desc: "The final CER (Claim-Evidence-Reasoning) explanation IS the performance task — a genuine scientific explanation of the anchoring phenomenon" },
+    orca: "Students write a final explanation: 'What causes the orca to struggle to find food, and what would need to change?' — supported by multiple forms of evidence",
+    placeholder: "What evidence of learning have you seen collected in your placement? Would a justice-centered teacher accept the same forms of evidence?"
+  },
+  {
+    label: "Learning Plan",
+    bd: { main: "Learning Plan / Sequence", desc: "What sequence of learning experiences will lead students to the desired results? What activities, instruction, and materials?" },
+    ast: { main: "AST Stages 1–4 Across the Unit", desc: "The full AST cycle IS the learning plan — elicitation → investigation → model revision → pressing for explanation, repeated and deepened" },
+    orca: "13 lessons across 7 lesson plans: elicitation → supporting ongoing thinking through data collection → model revision → final pressing for explanation",
+    placeholder: "Sketch the learning sequence of a unit you've seen. Can you identify AST stages in it? What stage gets the least time?"
+  },
+  {
+    label: "Transfer Goals",
+    bd: { main: "Transfer Goals", desc: "What should students be able to do independently, in new situations, using knowledge and skills from this unit?" },
+    ast: { main: "Justice & Agency — Taking Action", desc: "Transfer in AST means students USE their scientific understanding to take real civic action — letters, presentations, community advocacy" },
+    orca: "Students present their findings to a community panel; draft letters to the Port of Seattle advocating for quieter shipping lanes",
+    placeholder: "What would 'transfer' look like for students in a justice-centered unit? Find or design one example of a real-world transfer task for elementary students."
+  },
+];
+
+const examples = new Array(5).fill('');
+let selectedRow = 0;
+
+function selectRow(n, el) {
+  selectedRow = n;
+  document.querySelectorAll('.row-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = ROWS.map((row, i) => `
+    <tr class="data-row${i === selectedRow ? ' mine' : ''}" onclick="selectRow(${i}, document.querySelectorAll('.row-btn')[${i}])">
+      <td>${row.label}</td>
+      <td><div class="bd-element">${row.bd.main}</div><div class="bd-desc">${row.bd.desc}</div></td>
+      <td><div class="ast-element">${row.ast.main}</div><div class="ast-desc">${row.ast.desc}</div></td>
+      <td><div class="orca-example">${row.orca}</div></td>
+      <td class="my-example-cell">
+        <textarea class="example-input" 
+          placeholder="${row.placeholder}"
+          oninput="examples[${i}]=this.value"
+          onclick="event.stopPropagation()"
+        >${examples[i]}</textarea>
+      </td>
+    </tr>
+  `).join('');
+}
+
+renderTable();
+</script>
+</body>
+</html>

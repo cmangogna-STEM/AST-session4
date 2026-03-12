@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AST Session 4 — Facilitator Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070e12; --s1: #0d1820; --s2: #132030; --s3: #1a2838;
+  --teal: #1e7a8a; --teal-lt: #3ab8cc; --ice: #90dce8;
+  --sage: #3a7a58; --leaf: #5aaa78; --mint: #8ad4a8;
+  --amber: #b87830; --gold: #d8a830; --straw: #f0d890;
+  --rust: #a03828; --terra: #c85838; --blush: #f0a090;
+  --purple: #5a3a9a; --violet: #7a5ac8; --lavender: #b090e8;
+  --fog: #4a6878; --mist: #7a9aaa; --snow: #eef4f8;
+  --white: #fff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--snow);
+  min-height: 100vh;
+}
+
+/* Atmospheric deep-ocean background */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(30,122,138,0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(58,122,88,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 50%, rgba(90,58,154,0.08) 0%, transparent 50%);
+}
+
+/* ── Master header ── */
+.master-header {
+  background: var(--s1);
+  border-bottom: 2px solid rgba(58,184,204,0.2);
+  padding: 36px 48px 28px;
+  position: relative; overflow: hidden;
+}
+.master-header::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(58,184,204,0.4), transparent);
+}
+.mh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.mh-left {}
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal-lt); }
+.brand-text { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal-lt); }
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 3.5vw, 40px);
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.mh-sub { color: var(--mist); font-size: 14px; max-width: 560px; line-height: 1.6; }
+
+/* Session clock */
+.session-clock {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 18px 24px; text-align: center; flex-shrink: 0; min-width: 180px;
+}
+.sc-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--fog); margin-bottom: 8px; }
+.sc-time { font-family: 'Fraunces', serif; font-size: 44px; font-weight: 900; color: var(--teal-lt); line-height: 1; }
+.sc-sub { font-size: 11px; color: var(--fog); margin-top: 6px; }
+.sc-btns { display: flex; gap: 8px; margin-top: 10px; justify-content: center; }
+.sc-btn { background: rgba(58,184,204,0.12); border: 1px solid rgba(58,184,204,0.3); border-radius: 8px; padding: 6px 14px; color: var(--teal-lt); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.sc-btn:hover { background: rgba(58,184,204,0.22); }
+
+/* ── Progress bar ── */
+.progress-bar-wrap { display: flex; gap: 4px; margin-top: 24px; }
+.pb-block { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); transition: background 0.3s; }
+.pb-block.completed { background: var(--teal-lt); }
+.pb-block.current { background: var(--gold); animation: pulse-pb 1.5s ease-in-out infinite; }
+@keyframes pulse-pb { 0%,100%{opacity:1;}50%{opacity:0.5;} }
+
+/* ── Block sections ── */
+.blocks { padding: 32px 48px 48px; }
+
+.block-section { margin-bottom: 36px; }
+.block-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.block-num {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900;
+  flex-shrink: 0;
+}
+.block-info {}
+.block-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+.block-meta { font-size: 12px; color: var(--fog); display: flex; gap: 14px; }
+.block-time { display: flex; align-items: center; gap: 4px; }
+
+/* Block color themes */
+.blk-1 .block-num { background: rgba(30,122,138,0.3); color: var(--teal-lt); }
+.blk-2 .block-num { background: rgba(58,122,88,0.3); color: var(--mint); }
+.blk-3 .block-num { background: rgba(90,58,154,0.3); color: var(--lavender); }
+.blk-break .block-num { background: rgba(184,120,48,0.25); color: var(--straw); }
+.blk-4 .block-num { background: rgba(160,56,40,0.3); color: var(--blush); }
+.blk-5 .block-num { background: rgba(30,122,138,0.25); color: var(--ice); }
+.blk-6 .block-num { background: rgba(58,122,88,0.25); color: var(--leaf); }
+.blk-7 .block-num { background: rgba(90,58,154,0.25); color: var(--lavender); }
+
+/* ── Activity cards ── */
+.activities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+.act-card {
+  background: var(--s2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: pointer;
+  text-decoration: none; display: block;
+}
+.act-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+.act-card.done { opacity: 0.5; }
+.act-card.done:hover { opacity: 0.85; }
+
+.act-head { padding: 14px 16px 10px; display: flex; align-items: flex-start; gap: 10px; }
+.act-icon { font-size: 22px; flex-shrink: 0; }
+.act-head-text {}
+.act-num { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px; }
+.act-title { font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.3; }
+
+.act-body { padding: 0 16px 14px; }
+.act-desc { font-size: 12px; color: var(--mist); line-height: 1.5; margin-bottom: 10px; }
+.act-footer { display: flex; align-items: center; justify-content: space-between; }
+.act-time { font-size: 11px; font-weight: 700; color: var(--fog); display: flex; align-items: center; gap: 4px; }
+.act-method { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 3px 8px; border-radius: 6px; }
+.act-open-btn {
+  background: rgba(255,255,255,0.08); border: none; border-radius: 8px;
+  padding: 6px 12px; color: var(--snow); font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+}
+.act-open-btn:hover { background: rgba(255,255,255,0.15); }
+
+/* Color per block */
+.blk-1 .act-num { color: var(--teal-lt); }
+.blk-1 .act-method { background: rgba(30,122,138,0.25); color: var(--ice); }
+.blk-2 .act-num { color: var(--mint); }
+.blk-2 .act-method { background: rgba(58,122,88,0.25); color: var(--mint); }
+.blk-3 .act-num { color: var(--lavender); }
+.blk-3 .act-method { background: rgba(90,58,154,0.25); color: var(--lavender); }
+.blk-4 .act-num { color: var(--blush); }
+.blk-4 .act-method { background: rgba(160,56,40,0.25); color: var(--blush); }
+.blk-5 .act-num { color: var(--ice); }
+.blk-5 .act-method { background: rgba(30,122,138,0.2); color: var(--ice); }
+.blk-6 .act-num { color: var(--leaf); }
+.blk-6 .act-method { background: rgba(58,122,88,0.2); color: var(--mint); }
+.blk-7 .act-num { color: var(--lavender); }
+.blk-7 .act-method { background: rgba(90,58,154,0.2); color: var(--lavender); }
+
+/* Break card */
+.break-card {
+  background: rgba(184,120,48,0.1); border: 1px solid rgba(216,168,48,0.2);
+  border-radius: 14px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.break-text { font-size: 13px; color: var(--straw); font-style: italic; line-height: 1.5; }
+.break-time { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+
+/* ── Quick-launch bar ── */
+.quick-launch {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(7,14,18,0.95); backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 14px 48px;
+  display: flex; align-items: center; gap: 14px;
+  z-index: 100;
+}
+.ql-label { font-size: 11px; font-weight: 700; color: var(--fog); text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; }
+.ql-btns { display: flex; gap: 8px; overflow-x: auto; flex: 1; padding-bottom: 2px; }
+.ql-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 7px 14px; color: rgba(255,255,255,0.6);
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  white-space: nowrap; text-decoration: none; display: block;
+}
+.ql-btn:hover { background: rgba(255,255,255,0.12); color: var(--white); }
+.ql-btn.current { background: var(--teal); border-color: var(--teal); color: var(--white); }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .master-header { padding: 24px; }
+  .blocks { padding: 20px 24px 80px; }
+  .mh-top { flex-direction: column; }
+  .quick-launch { padding: 12px 20px; }
+}
+
+.mark-done-btn {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; padding: 4px 10px; color: rgba(255,255,255,0.4);
+  font-size: 11px; cursor: pointer; transition: all 0.15s; margin-left: auto;
+}
+.mark-done-btn:hover { background: rgba(90,170,120,0.2); color: var(--mint); }
+.mark-done-btn.done-state { background: rgba(90,170,120,0.2); color: var(--mint); border-color: rgba(90,170,120,0.35); }
+</style>
+</head>
+<body>
+
+<!-- Master Header -->
+<div class="master-header">
+  <div class="mh-top">
+    <div class="mh-left">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <div class="brand-text">Ambitious Science Teaching · Session 4</div>
+      </div>
+      <h1>Facilitator Activity Hub</h1>
+      <p class="mh-sub">Teaching Science for Justice: Revising Thinking, Climate Justice & Ambitious Unit Design — 3 Hours · All 15 Interactive Activities</p>
+    </div>
+    <div class="session-clock">
+      <div class="sc-label">Session Clock</div>
+      <div class="sc-time" id="sc-time">0:00</div>
+      <div class="sc-sub">elapsed</div>
+      <div class="sc-btns">
+        <button class="sc-btn" onclick="toggleClock()">▶ Start</button>
+        <button class="sc-btn" onclick="resetClock()">↺</button>
+      </div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap" id="progress-bar">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- All Blocks -->
+<div class="blocks">
+
+  <!-- BLOCK 1 -->
+  <div class="block-section blk-1" id="block-1">
+    <div class="block-header">
+      <div class="block-num">1</div>
+      <div class="block-info">
+        <div class="block-title">Opening & AST Cycle Recap</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 0:00 – 0:25</span>
+          <span>25 minutes</span>
+          <span>All AST Stages</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-1" href="1_1_confidence_poll.html" target="_blank" id="card-1-1">
+        <div class="act-head">
+          <div class="act-icon">📊</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 1.1</div>
+            <div class="act-title">Where Are We in the AST Cycle?</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Confidence sliders for Stage 3 & 4, plus a simultaneous Chat Waterfall — participants type one word about their placement</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 8 min</span>
+            <span class="act-method">Poll + Waterfall</span>
+            <button class="mark-done-btn" onclick="markDone(event,'1-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-1" href="1_2_ast_swim_lanes.html" target="_blank" id="card-1-2">
+        <div class="act-head">
+          <div class="act-icon">🏊</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 1.2</div>
+            <div class="act-title">AST Swim Lane Sort</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Drag 16 cards — tools, teacher moves, lesson types — into the correct AST stage lane. Hover for hints. Check answers.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 12 min</span>
+            <span class="act-method">Drag & Drop</span>
+            <button class="mark-done-btn" onclick="markDone(event,'1-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-1" href="1_3_driving_questions.html" target="_blank" id="card-1-3">
+        <div class="act-head">
+          <div class="act-icon">❓</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 1.3</div>
+            <div class="act-title">Today's Driving Questions</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Dramatic reveal of both driving questions + live vote on which feels most urgent. Results display as a bar chart.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 5 min</span>
+            <span class="act-method">Reveal + Vote</span>
+            <button class="mark-done-btn" onclick="markDone(event,'1-3')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BLOCK 2 -->
+  <div class="block-section blk-2" id="block-2">
+    <div class="block-header">
+      <div class="block-num">2</div>
+      <div class="block-info">
+        <div class="block-title">Must-Have Checklists & Model Revision</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 0:25 – 0:55</span>
+          <span>30 minutes</span>
+          <span>Stage 3 & 4</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-2" href="2_1_word_bank_vs_mhc.html" target="_blank" id="card-2-1">
+        <div class="act-head">
+          <div class="act-icon">⚖️</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 2.1</div>
+            <div class="act-title">Word Bank vs. Must-Have Checklist</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Side-by-side model critique with an interactive MHC to check off items. Chat stem: "The key difference I notice is..."</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 10 min</span>
+            <span class="act-method">Model Critique</span>
+            <button class="mark-done-btn" onclick="markDone(event,'2-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-2" href="2_2_video_analysis.html" target="_blank" id="card-2-2">
+        <div class="act-head">
+          <div class="act-icon">🎬</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 2.2</div>
+            <div class="act-title">Video Analysis — 5th Grade Astronomy</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">3-column observation protocol (student ideas / teacher moves / the checklist) + 4 differentiated breakout room questions including a justice lens</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 15 min</span>
+            <span class="act-method">Video + Breakouts</span>
+            <button class="mark-done-btn" onclick="markDone(event,'2-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-2" href="2_3_mhc_design.html" target="_blank" id="card-2-3">
+        <div class="act-head">
+          <div class="act-icon">🛠️</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 2.3</div>
+            <div class="act-title">Design Your Own Must-Have Checklist</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">3-minute timed design sprint. Real-time validation flags vocabulary words vs. relational statements. Preview student view. Copy best item to chat.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 5 min</span>
+            <span class="act-method">Design Sprint</span>
+            <button class="mark-done-btn" onclick="markDone(event,'2-3')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BLOCK 3 -->
+  <div class="block-section blk-3" id="block-3">
+    <div class="block-header">
+      <div class="block-num">3</div>
+      <div class="block-info">
+        <div class="block-title">Justice-Centered Stakeholder Meetings</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 0:55 – 1:20</span>
+          <span>25 minutes</span>
+          <span>All Stages + Justice</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-3" href="3_1_stakeholder_video.html" target="_blank" id="card-3-1">
+        <div class="act-head">
+          <div class="act-icon">🌊</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 3.1</div>
+            <div class="act-title">Edmonds Beach Cliff: Video Analysis</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">5 justice dimensions to check off while watching. 3-lens protocol: talk moves / student thinking / equity practices. 4 whole-class discussion prompts.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 10 min</span>
+            <span class="act-method">Video + Protocol</span>
+            <button class="mark-done-btn" onclick="markDone(event,'3-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-3" href="3_2_stakeholder_roleplay.html" target="_blank" id="card-3-2">
+        <div class="act-head">
+          <div class="act-icon">🎭</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 3.2</div>
+            <div class="act-title">Micro-Stakeholder Meeting Role Play</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">3 justice phenomena × 5 character cards each (including non-human stakeholders). Teacher-role checklist. 6 talk moves. 8-minute breakout timer. Debrief prompts.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 15 min</span>
+            <span class="act-method">Role Play</span>
+            <button class="mark-done-btn" onclick="markDone(event,'3-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BREAK -->
+  <div class="block-section blk-break" id="block-break">
+    <div class="block-header">
+      <div class="block-num">☕</div>
+      <div class="block-info">
+        <div class="block-title">Break + Eco-emotion Quickwrite</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 1:20 – 1:35</span>
+          <span>15 minutes</span>
+        </div>
+      </div>
+    </div>
+    <div class="break-card">
+      <div class="break-text">
+        During break: participants complete the eco-emotion quickwrite prompt sent 24 hrs ahead — <em>anxiety → hope.</em><br>
+        On return: 2–3 people share their <strong>hope</strong> (not the anxiety) before Block 4 begins.
+      </div>
+      <div class="break-time">15 min</div>
+    </div>
+  </div>
+
+  <!-- BLOCK 4 -->
+  <div class="block-section blk-4" id="block-4">
+    <div class="block-header">
+      <div class="block-num">4</div>
+      <div class="block-info">
+        <div class="block-title">Climate Change & Climate Justice</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 1:35 – 2:00</span>
+          <span>25 minutes</span>
+          <span>Justice Focus</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-4" href="4_1_climate_poll.html" target="_blank" id="card-4-1">
+        <div class="act-head">
+          <div class="act-icon">☁️</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 4.1</div>
+            <div class="act-title">Climate Word Cloud + 5-Point Framework</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Live word cloud from participant responses. Expandable 5-point framework (It's real / happening now / human-caused / urgent / solvable). Discussion prompts.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 7 min</span>
+            <span class="act-method">Poll + Framework</span>
+            <button class="mark-done-btn" onclick="markDone(event,'4-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-4" href="4_2_case_study.html" target="_blank" id="card-4-2">
+        <div class="act-head">
+          <div class="act-icon">🔬</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 4.2</div>
+            <div class="act-title">Climate Justice Case Study Analysis</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Two real classroom examples (Rainforest/Eritrea; City Design). Mark 7 eco-emotion strategies as Found or Missing. Design one addition. 18-minute timer with phase breakdown.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 18 min</span>
+            <span class="act-method">Case Study</span>
+            <button class="mark-done-btn" onclick="markDone(event,'4-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BLOCK 5 -->
+  <div class="block-section blk-5" id="block-5">
+    <div class="block-header">
+      <div class="block-num">5</div>
+      <div class="block-info">
+        <div class="block-title">Backwards Design + AST Unit Planning</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 2:00 – 2:30</span>
+          <span>30 minutes</span>
+          <span>All Stages</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-5" href="5_1_backwards_design.html" target="_blank" id="card-5-1">
+        <div class="act-head">
+          <div class="act-icon">🧩</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 5.1</div>
+            <div class="act-title">Backwards Design ↔ AST Mapping Table</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Jigsaw: each participant owns one row. 5-row mapping table with BD element, AST connection, Orca unit example, and a personal example column. 4 discussion prompts.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 12 min</span>
+            <span class="act-method">Jigsaw Table</span>
+            <button class="mark-done-btn" onclick="markDone(event,'5-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-5" href="5_2_unit_sketch.html" target="_blank" id="card-5-2">
+        <div class="act-head">
+          <div class="act-icon">✏️</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 5.2</div>
+            <div class="act-title">Unit Sketch Design Sprint</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">4-phase workflow: choose phenomenon → draft 5-stage sketch → Raising the Bar peer critique → revise & share Stage 4. Timer advances automatically through phases.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 18 min</span>
+            <span class="act-method">Design + Critique</span>
+            <button class="mark-done-btn" onclick="markDone(event,'5-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BLOCK 6 -->
+  <div class="block-section blk-6" id="block-6">
+    <div class="block-header">
+      <div class="block-num">6</div>
+      <div class="block-info">
+        <div class="block-title">Storylines & Back-Pocket Questions</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 2:30 – 2:55</span>
+          <span>25 minutes</span>
+          <span>All Stages</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-6" href="6_1_storylines_gallery.html" target="_blank" id="card-6-1">
+        <div class="act-head">
+          <div class="act-icon">🖼️</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 6.1</div>
+            <div class="act-title">Storylines Gallery Walk</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Three unit storylines (Rainforest, Orca, LiP) displayed side-by-side. Color-coded sticky reactions (🟢 justice / 🟡 phenomena-driven / 🔴 wonder). 6 discussion prompts. 12-minute timer.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 12 min</span>
+            <span class="act-method">Gallery Walk</span>
+            <button class="mark-done-btn" onclick="markDone(event,'6-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+      <a class="act-card blk-6" href="6_2_bpq_practice.html" target="_blank" id="card-6-2">
+        <div class="act-head">
+          <div class="act-icon">💬</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 6.2</div>
+            <div class="act-title">Back-Pocket Questions Practice</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">WHAT → HOW → WHY progression explainer. Pick a student statement. Write 3 BPQs. Real-time depth evaluator flags vocabulary-level vs. mechanism-level questions. Peer swap + copy to chat.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 13 min</span>
+            <span class="act-method">Writing + Swap</span>
+            <button class="mark-done-btn" onclick="markDone(event,'6-2')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BLOCK 7 -->
+  <div class="block-section blk-7" id="block-7">
+    <div class="block-header">
+      <div class="block-num">7</div>
+      <div class="block-info">
+        <div class="block-title">Closing Reflection & Commitment</div>
+        <div class="block-meta">
+          <span class="block-time">⏱ 2:55 – 3:00</span>
+          <span>5 minutes</span>
+          <span>Justice + All</span>
+        </div>
+      </div>
+    </div>
+    <div class="activities-grid">
+      <a class="act-card blk-7" href="7_1_closing_reflection.html" target="_blank" id="card-7-1">
+        <div class="act-head">
+          <div class="act-icon">🌱</div>
+          <div class="act-head-text">
+            <div class="act-num">Activity 7.1</div>
+            <div class="act-title">Hope Is a Discipline</div>
+          </div>
+        </div>
+        <div class="act-body">
+          <div class="act-desc">Return to driving questions → write commitment stems → Hope Wall (live cards) → eco-emotion arc. Closes with Mariame Kaba + Paulo Freire quotes. Chat waterfall for commitments.</div>
+          <div class="act-footer">
+            <span class="act-time">⏱ 5 min</span>
+            <span class="act-method">Reflection + Wall</span>
+            <button class="mark-done-btn" onclick="markDone(event,'7-1')">✓ Done</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Quick launch bar -->
+<div class="quick-launch">
+  <div class="ql-label">Quick Launch →</div>
+  <div class="ql-btns">
+    <a class="ql-btn" href="1_1_confidence_poll.html" target="_blank">1.1 Poll</a>
+    <a class="ql-btn" href="1_2_ast_swim_lanes.html" target="_blank">1.2 Swim Lanes</a>
+    <a class="ql-btn" href="1_3_driving_questions.html" target="_blank">1.3 DQs</a>
+    <a class="ql-btn" href="2_1_word_bank_vs_mhc.html" target="_blank">2.1 MHC Critique</a>
+    <a class="ql-btn" href="2_2_video_analysis.html" target="_blank">2.2 Video</a>
+    <a class="ql-btn" href="2_3_mhc_design.html" target="_blank">2.3 Design</a>
+    <a class="ql-btn" href="3_1_stakeholder_video.html" target="_blank">3.1 Edmonds</a>
+    <a class="ql-btn" href="3_2_stakeholder_roleplay.html" target="_blank">3.2 Role Play</a>
+    <a class="ql-btn" href="4_1_climate_poll.html" target="_blank">4.1 Climate</a>
+    <a class="ql-btn" href="4_2_case_study.html" target="_blank">4.2 Cases</a>
+    <a class="ql-btn" href="5_1_backwards_design.html" target="_blank">5.1 BD Map</a>
+    <a class="ql-btn" href="5_2_unit_sketch.html" target="_blank">5.2 Unit Sketch</a>
+    <a class="ql-btn" href="6_1_storylines_gallery.html" target="_blank">6.1 Gallery</a>
+    <a class="ql-btn" href="6_2_bpq_practice.html" target="_blank">6.2 BPQs</a>
+    <a class="ql-btn" href="7_1_closing_reflection.html" target="_blank">7.1 Close</a>
+  </div>
+</div>
+
+<script>
+// ── Session clock ──
+let clockSec = 0, clockRunning = false, clockInterval = null;
+function toggleClock() {
+  if (clockRunning) {
+    clearInterval(clockInterval); clockRunning = false;
+  } else {
+    clockRunning = true;
+    clockInterval = setInterval(() => {
+      clockSec++;
+      const h = Math.floor(clockSec/3600);
+      const m = Math.floor((clockSec%3600)/60);
+      const s = clockSec%60;
+      document.getElementById('sc-time').textContent =
+        h > 0
+          ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`
+          : `${m}:${s.toString().padStart(2,'0')}`;
+    }, 1000);
+  }
+}
+function resetClock() {
+  clearInterval(clockInterval); clockRunning = false; clockSec = 0;
+  document.getElementById('sc-time').textContent = '0:00';
+}
+
+// ── Progress bar (15 activities) ──
+const ACTIVITY_IDS = [
+  '1-1','1-2','1-3',
+  '2-1','2-2','2-3',
+  '3-1','3-2',
+  '4-1','4-2',
+  '5-1','5-2',
+  '6-1','6-2',
+  '7-1'
+];
+const done = new Set(JSON.parse(localStorage.getItem('ast-done') || '[]'));
+
+function buildProgressBar() {
+  const bar = document.getElementById('progress-bar');
+  bar.innerHTML = ACTIVITY_IDS.map(id => `<div class="pb-block${done.has(id)?' completed':''}" id="pb-${id}"></div>`).join('');
+}
+
+function markDone(evt, id) {
+  evt.preventDefault();
+  evt.stopPropagation();
+  const btn = evt.target;
+  const card = document.getElementById('card-'+id);
+  if (done.has(id)) {
+    done.delete(id);
+    card.classList.remove('done');
+    btn.textContent = '✓ Done';
+    btn.classList.remove('done-state');
+    document.getElementById('pb-'+id)?.classList.remove('completed');
+  } else {
+    done.add(id);
+    card.classList.add('done');
+    btn.textContent = '✓ Done ✓';
+    btn.classList.add('done-state');
+    document.getElementById('pb-'+id)?.classList.add('completed');
+  }
+  try { localStorage.setItem('ast-done', JSON.stringify([...done])); } catch(e){}
+}
+
+// Restore done state
+function restoreDone() {
+  done.forEach(id => {
+    const card = document.getElementById('card-'+id);
+    const btn = card?.querySelector('.mark-done-btn');
+    if (card) card.classList.add('done');
+    if (btn) { btn.textContent = '✓ Done ✓'; btn.classList.add('done-state'); }
+  });
+}
+
+buildProgressBar();
+restoreDone();
+</script>
+</body>
+</html>

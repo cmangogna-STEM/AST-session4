@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 5.2 — Unit Sketch Design Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0c1018;--surface:#13181f;--card:#1a2030;--raised:#222a3a;
+    --indigo:#2a3a7e;--blue:#3a62c8;--sky:#5a9ae8;--ice:#a0c8f8;
+    --gold:#d4a040;--amber:#e8c060;
+    --sage:#4a8a60;--leaf:#70b880;--lt-leaf:#a0d4b0;
+    --rust:#b84030;--terracotta:#d46050;
+    --fog:#606878;--mist:#9aa8b8;--snow:#ecf0f8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--snow); min-height: 100vh; }
+
+  .header { background: var(--surface); border-bottom: 1px solid rgba(58,98,200,0.2); padding: 20px 36px; display: flex; justify-content: space-between; align-items: center; }
+  .header-left {}
+  .tag-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .t1 { background: var(--indigo); color: var(--sky); }
+  .t2 { background: rgba(212,160,64,0.2); border: 1px solid rgba(232,192,96,0.4); color: var(--amber); }
+  h1 { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+  .header-sub { color: var(--fog); font-size: 13px; }
+
+  .timer-area { text-align: right; }
+  .timer-num { font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700; color: var(--amber); line-height: 1; }
+  .timer-label { font-size: 11px; color: var(--fog); margin-top: 3px; }
+  .timer-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+  .tbtn { background: rgba(232,192,96,0.12); border: 1px solid rgba(232,192,96,0.3); border-radius: 8px; padding: 6px 14px; color: var(--amber); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .tbtn:hover { background: rgba(232,192,96,0.22); }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 24px 36px; }
+
+  /* Phase tabs */
+  .phases { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+  .phase-step { flex: 1; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.2s; text-align: center; position: relative; }
+  .phase-step:first-child { border-radius: 12px 0 0 12px; }
+  .phase-step:last-child { border-radius: 0 12px 12px 0; }
+  .phase-step.active { background: var(--indigo); border-color: var(--blue); z-index: 1; }
+  .phase-step.done { background: rgba(74,138,96,0.2); border-color: rgba(112,184,128,0.3); }
+  .phase-num { font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.3); display: block; margin-bottom: 3px; }
+  .phase-step.active .phase-num { color: var(--ice); }
+  .phase-step.done .phase-num { color: var(--lt-leaf); }
+  .phase-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); }
+  .phase-step.active .phase-label { color: var(--snow); }
+  .phase-step.done .phase-label { color: var(--lt-leaf); }
+  .phase-time { font-size: 10px; color: var(--fog); margin-top: 2px; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+
+  /* Phenomenon choice */
+  .phenom-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .phenom-opt { background: var(--card); border: 2px solid transparent; border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 0.2s; }
+  .phenom-opt:hover { border-color: rgba(90,154,232,0.35); }
+  .phenom-opt.chosen { border-color: var(--blue); background: rgba(42,58,126,0.2); }
+  .po-title { font-family: 'Lora', serif; font-size: 16px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+  .po-grade { font-size: 11px; color: var(--sky); font-weight: 600; }
+  .po-science { font-size: 12px; color: var(--fog); margin-top: 4px; }
+
+  /* Unit sketch table */
+  .sketch-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+  .sk-row-header { background: var(--card); border-radius: 10px; }
+  .sk-row { background: var(--raised); border-radius: 10px; }
+  .sk-row td, .sk-row-header th { padding: 12px 14px; }
+  .sk-row-header th { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--fog); text-align: left; }
+  .sk-row-header th:nth-child(2) { color: var(--sky); }
+  .sk-row-header th:nth-child(3) { color: var(--leaf); }
+  .sk-row-header th:nth-child(4) { color: var(--amber); }
+  .sk-row-header th:nth-child(5) { color: var(--terracotta); }
+
+  .stage-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; }
+  .sp-1 { background: rgba(42,58,126,0.3); color: var(--ice); }
+  .sp-2 { background: rgba(58,98,200,0.25); color: var(--sky); }
+  .sp-3 { background: rgba(74,138,96,0.25); color: var(--lt-leaf); }
+  .sp-4 { background: rgba(184,64,48,0.25); color: #e89080; }
+  .sp-5 { background: rgba(212,160,64,0.2); color: var(--amber); }
+
+  .cell-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: var(--snow); font-family: 'Space Grotesk', sans-serif; font-size: 12px; resize: none; outline: none; min-height: 65px; line-height: 1.45; transition: border-color 0.2s; }
+  .cell-input:focus { border-color: var(--blue); }
+  .cell-input::placeholder { color: rgba(255,255,255,0.18); font-style: italic; }
+
+  /* Critique phase */
+  .critique-box { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px 26px; margin-bottom: 20px; }
+  .crit-title { font-family: 'Lora', serif; font-size: 16px; font-weight: 700; color: var(--snow); margin-bottom: 6px; }
+  .crit-sub { font-size: 13px; color: var(--fog); margin-bottom: 18px; line-height: 1.5; }
+  .crit-section { margin-bottom: 16px; }
+  .crit-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .crit-1 .crit-label { color: var(--leaf); }
+  .crit-2 .crit-label { color: var(--amber); }
+  .crit-3 .crit-label { color: var(--sky); }
+  .crit-1 .crit-input { border-color: rgba(112,184,128,0.3); }
+  .crit-2 .crit-input { border-color: rgba(232,192,96,0.3); }
+  .crit-3 .crit-input { border-color: rgba(90,154,232,0.3); }
+  .crit-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: var(--snow); font-family: 'Space Grotesk', sans-serif; font-size: 13px; resize: none; outline: none; min-height: 80px; line-height: 1.5; transition: border-color 0.2s; }
+  .crit-input:focus { border-color: var(--blue); }
+  .crit-input::placeholder { color: rgba(255,255,255,0.22); font-style: italic; }
+
+  /* Criteria checklist */
+  .criteria-panel { background: rgba(42,58,126,0.1); border: 1px solid rgba(90,154,232,0.2); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
+  .cp-title { font-size: 12px; font-weight: 700; color: var(--sky); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .crit-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; cursor: pointer; }
+  .crit-check-box { width: 20px; height: 20px; border: 2px solid rgba(90,154,232,0.4); border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .crit-check.checked .crit-check-box { background: var(--blue); border-color: var(--blue); color: white; font-size: 12px; }
+  .crit-check-text { font-size: 13px; color: rgba(255,255,255,0.78); line-height: 1.4; }
+
+  .next-btn { background: var(--blue); color: white; border: none; border-radius: 10px; padding: 12px 28px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 16px; }
+  .next-btn:hover { background: var(--sky); color: var(--bg); }
+
+  .section-label { font-size: 11px; font-weight: 700; color: var(--fog); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="tag-row">
+      <div class="tag t1">Block 5 · Activity 5.2</div>
+      <div class="tag t2">Design Sprint + Critique</div>
+    </div>
+    <h1>Unit Sketch Design Sprint</h1>
+    <div class="header-sub">10 min draft → Raising the Bar peer critique → share revised Stage 4</div>
+  </div>
+  <div class="timer-area">
+    <div class="timer-num" id="timer-num">10:00</div>
+    <div class="timer-label" id="timer-label">Design phase</div>
+    <div class="timer-btns">
+      <button class="tbtn" onclick="toggleTimer()">▶ Start</button>
+      <button class="tbtn" onclick="resetTimer()">↺</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="phases">
+    <div class="phase-step active" onclick="goPhase(0)">
+      <span class="phase-num">1</span>
+      <div class="phase-label">Choose Phenomenon</div>
+      <div class="phase-time">2 min</div>
+    </div>
+    <div class="phase-step" onclick="goPhase(1)">
+      <span class="phase-num">2</span>
+      <div class="phase-label">Draft Unit Sketch</div>
+      <div class="phase-time">10 min</div>
+    </div>
+    <div class="phase-step" onclick="goPhase(2)">
+      <span class="phase-num">3</span>
+      <div class="phase-label">Raising the Bar Critique</div>
+      <div class="phase-time">8 min</div>
+    </div>
+    <div class="phase-step" onclick="goPhase(3)">
+      <span class="phase-num">4</span>
+      <div class="phase-label">Revise & Share</div>
+      <div class="phase-time">~3 min</div>
+    </div>
+  </div>
+
+  <!-- PHASE 1: Choose -->
+  <div class="tab-panel active" id="phase-0">
+    <div class="section-label">Choose your group's phenomenon — or use one from your placement</div>
+    <div class="phenom-choice">
+      <div class="phenom-opt chosen" id="p-default">
+        <div class="po-title">🌡 Why is our playground hotter than the park two blocks away?</div>
+        <div class="po-grade">Grade 4 · Energy Transfer · Urban Heat Island</div>
+        <div class="po-science">Science: thermal energy, albedo, radiation, convection. Justice: why do some neighborhoods have less tree canopy and more concrete?</div>
+      </div>
+      <div class="phenom-opt" onclick="this.classList.toggle('chosen')">
+        <div class="po-title">🐋 Why can't the orca find enough food?</div>
+        <div class="po-grade">Grade 5 · Sound · Orca Sound Pollution</div>
+        <div class="po-science">Science: sound waves, energy transfer, echolocation. Justice: who has power over shipping routes and why does it matter?</div>
+      </div>
+      <div class="phenom-opt" onclick="this.classList.toggle('chosen')">
+        <div class="po-title">💧 Why do some puddles dry up faster than others?</div>
+        <div class="po-grade">Grade 2 · Evaporation · Water Cycle</div>
+        <div class="po-science">Science: evaporation, heat energy, surface area. Justice: who has access to clean water in our community?</div>
+      </div>
+      <div class="phenom-opt" onclick="this.classList.toggle('chosen')">
+        <div class="po-title">✏ Our own phenomenon</div>
+        <div class="po-grade">From your placement</div>
+        <div class="po-science">Use a phenomenon from your placement school or design one centered on your students' community</div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="goPhase(1)">Start Drafting →</button>
+  </div>
+
+  <!-- PHASE 2: Draft -->
+  <div class="tab-panel" id="phase-1">
+    <div class="section-label">Unit Sketch Template — 5 stages</div>
+    <table class="sketch-table">
+      <thead>
+        <tr class="sk-row-header">
+          <th>AST Stage</th>
+          <th>What students do</th>
+          <th>Teacher's Stage 3/4 move</th>
+          <th>Justice connection</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="sk-row">
+          <td><div class="stage-pill sp-1">① Elicit</div></td>
+          <td><textarea class="cell-input" placeholder="Students see the phenomenon, share initial ideas, generate questions..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="Teacher uses What-How-Why to elicit — doesn't correct, just records all ideas..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="How does this phenomenon connect to THIS community? Whose lives does it affect?"></textarea></td>
+        </tr>
+        <tr class="sk-row">
+          <td><div class="stage-pill sp-2">② Investigate</div></td>
+          <td><textarea class="cell-input" placeholder="Students collect data, run experiments, study models..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="BPQs during investigation: 'What do you notice? What causes that? Why does it work that way?'"></textarea></td>
+          <td><textarea class="cell-input" placeholder="Whose knowledge counts as data here? What community knowledge could inform the investigation?"></textarea></td>
+        </tr>
+        <tr class="sk-row">
+          <td><div class="stage-pill sp-3">③ Support Thinking</div></td>
+          <td><textarea class="cell-input" placeholder="Students revise initial models, add evidence to summary table, discuss with peers..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="Re-voice, harvest disagreement, make thinking visible with public records..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="How is community knowledge incorporated into the summary table? Whose experiences appear as 'data'?"></textarea></td>
+        </tr>
+        <tr class="sk-row">
+          <td><div class="stage-pill sp-4">④ Press for Explanation</div></td>
+          <td><textarea class="cell-input" placeholder="Students write CER explanation using Must-Have Checklist, revise final models..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="CRITICAL: What pressing question requires students to explain MECHANISM, not just pattern?"></textarea></td>
+          <td><textarea class="cell-input" placeholder="Does the final explanation require connecting science to justice? Why does the pattern exist?"></textarea></td>
+        </tr>
+        <tr class="sk-row">
+          <td><div class="stage-pill sp-5">⑤ Take Action</div></td>
+          <td><textarea class="cell-input" placeholder="Students communicate findings to a real decision-maker or community audience..."></textarea></td>
+          <td><textarea class="cell-input" placeholder="How does the teacher support student agency without overscripting the action?"></textarea></td>
+          <td><textarea class="cell-input" placeholder="Who is the real audience? How does the action connect to changing power over the issue?"></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="next-btn" onclick="goPhase(2)">Exchange for Critique →</button>
+  </div>
+
+  <!-- PHASE 3: Critique -->
+  <div class="tab-panel" id="phase-2">
+    <div style="background:rgba(212,160,64,0.1);border:1px solid rgba(212,160,64,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55;">
+      <strong style="color:var(--amber);">Facilitator:</strong> Groups swap their sketches. Each group reads another group's sketch and completes the Raising the Bar protocol below. 8 minutes.
+    </div>
+
+    <div class="critique-box">
+      <div class="crit-title">Raising the Bar — Peer Critique Protocol</div>
+      <div class="crit-sub">Read your partner group's sketch carefully. Complete all three sections.</div>
+
+      <div class="crit-section crit-1">
+        <div class="crit-label">✓ Two Strengths</div>
+        <textarea class="crit-input" placeholder="Name two specific things the sketch does well. Be precise — 'Stage 3 is strong because...' not just 'I liked it'..."></textarea>
+      </div>
+      <div class="crit-section crit-2">
+        <div class="crit-label">△ Weakest Element</div>
+        <textarea class="crit-input" placeholder="Which Stage 3 or Stage 4 element is weakest? Is the pressing question pushing for mechanism or just pattern? Is the justice connection woven in or bolted on?"></textarea>
+      </div>
+      <div class="crit-section crit-3">
+        <div class="crit-label">? Your BPQ for Stage 4</div>
+        <textarea class="crit-input" placeholder="Write ONE pressing question for Stage 4 that would push students from observation to mechanism. It should start: 'Why does...' or 'How does... cause...'"></textarea>
+      </div>
+    </div>
+
+    <div class="criteria-panel">
+      <div class="cp-title">Raising the Bar Criteria (check as you evaluate)</div>
+      <div class="crit-check" onclick="this.classList.toggle('checked')">
+        <div class="crit-check-box"></div>
+        <div class="crit-check-text">Is Stage 4 pressing for MECHANISM or just confirming a pattern?</div>
+      </div>
+      <div class="crit-check" onclick="this.classList.toggle('checked')">
+        <div class="crit-check-box"></div>
+        <div class="crit-check-text">Does the justice connection feel woven into the phenomenon, or bolted on as an add-on?</div>
+      </div>
+      <div class="crit-check" onclick="this.classList.toggle('checked')">
+        <div class="crit-check-box"></div>
+        <div class="crit-check-text">Where would a student's grandmother's knowledge appear in this unit?</div>
+      </div>
+      <div class="crit-check" onclick="this.classList.toggle('checked')">
+        <div class="crit-check-box"></div>
+        <div class="crit-check-text">Does Stage 5 (Take Action) connect to a REAL decision-maker or audience?</div>
+      </div>
+      <div class="crit-check" onclick="this.classList.toggle('checked')">
+        <div class="crit-check-box"></div>
+        <div class="crit-check-text">Could a student with limited English literacy engage fully with every stage?</div>
+      </div>
+    </div>
+    <button class="next-btn" onclick="goPhase(3)">Return & Revise →</button>
+  </div>
+
+  <!-- PHASE 4: Share -->
+  <div class="tab-panel" id="phase-3">
+    <div style="background:rgba(74,138,96,0.1);border:1px solid rgba(74,138,96,0.3);border-radius:14px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Share Back with the Class</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;">Each group shares their <strong>revised Stage 4 element</strong> — before and after the critique. What changed? What did the critique reveal?</div>
+    </div>
+    <div class="critique-box">
+      <div class="crit-title">Your Revised Stage 4 (after critique)</div>
+      <div class="crit-sub">What was Stage 4 before? What is it now? What made the critique useful (or not useful)?</div>
+      <div class="crit-section crit-1">
+        <div class="crit-label">Stage 4 BEFORE critique</div>
+        <textarea class="crit-input" placeholder="Copy your original Stage 4 pressing question or student task here..."></textarea>
+      </div>
+      <div class="crit-section crit-3">
+        <div class="crit-label">Stage 4 AFTER revision</div>
+        <textarea class="crit-input" placeholder="What changed? Is the pressing question now getting at mechanism? Is the justice connection deeper?"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  { label: 'Design phase', secs: 2*60 },
+  { label: 'Draft — 10 min', secs: 10*60 },
+  { label: 'Critique — 8 min', secs: 8*60 },
+  { label: 'Share back', secs: 3*60 },
+];
+let currentPhase = 0, timerSec = PHASES[0].secs, timerRunning = false, timerInterval = null;
+
+function goPhase(n) {
+  currentPhase = n;
+  clearInterval(timerInterval); timerRunning = false;
+  timerSec = PHASES[n].secs;
+  updateTimerDisplay();
+  document.getElementById('timer-label').textContent = PHASES[n].label;
+  document.querySelectorAll('.phase-step').forEach((el, i) => {
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  });
+  document.querySelectorAll('.tab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('phase-'+n).classList.add('active');
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSec/60), s = timerSec%60;
+  document.getElementById('timer-num').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function toggleTimer() {
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+  else {
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timerSec--;
+      updateTimerDisplay();
+      if (timerSec <= 0) { clearInterval(timerInterval); timerRunning = false; document.getElementById('timer-num').style.color = 'var(--terracotta)'; }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false;
+  timerSec = PHASES[currentPhase].secs;
+  updateTimerDisplay();
+  document.getElementById('timer-num').style.color = '';
+}
+</script>
+</body>
+</html>

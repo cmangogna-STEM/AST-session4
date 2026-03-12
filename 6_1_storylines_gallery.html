@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 6.1 — Storylines Gallery Walk</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,700;0,900;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f0c; --s1: #111a14; --s2: #182318; --s3: #1f2e20;
+  --teal: #2a7a6a; --teal-lt: #4ab8a0; --ice: #a8ddd4;
+  --amber: #c07830; --gold: #e0a840; --straw: #f8e098;
+  --rust: #a83820; --terra: #cc5838; --blush: #f0a090;
+  --fog: #5a7068; --mist: #8ab0a0; --snow: #eef5f0;
+  --white: #fff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--snow); min-height: 100vh; }
+
+/* Organic background */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 20%, rgba(42,122,106,0.14) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 50% at 85% 80%, rgba(192,120,48,0.08) 0%, transparent 100%);
+}
+
+/* ── Header ── */
+.header {
+  background: var(--s1); border-bottom: 2px solid rgba(74,184,160,0.2);
+  padding: 20px 36px; display: flex; align-items: flex-start; justify-content: space-between;
+}
+.tag-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.tag { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+.t-block { background: var(--teal); color: var(--snow); }
+.t-method { background: rgba(192,120,48,0.2); border: 1px solid rgba(224,168,64,0.4); color: var(--gold); }
+h1 { font-family: 'Bitter', serif; font-size: 22px; font-weight: 900; color: var(--snow); margin-bottom: 4px; }
+.header-sub { color: var(--fog); font-size: 13px; }
+.time-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,184,160,0.1); border: 1px solid rgba(74,184,160,0.25); color: var(--teal-lt); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-top: 8px; }
+
+/* Timer */
+.timer-box { text-align: right; }
+.timer-num { font-family: 'Bitter', serif; font-size: 44px; font-weight: 900; color: var(--teal-lt); line-height: 1; }
+.timer-label { font-size: 11px; color: var(--fog); margin-top: 3px; }
+.timer-btns { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+.tbtn { background: rgba(74,184,160,0.1); border: 1px solid rgba(74,184,160,0.3); border-radius: 8px; padding: 7px 16px; color: var(--teal-lt); font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+.tbtn:hover { background: rgba(74,184,160,0.2); }
+
+/* ── View tabs ── */
+.view-tabs { display: flex; gap: 0; padding: 16px 36px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.vtab { padding: 10px 22px; border-bottom: 3px solid transparent; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s; }
+.vtab.active { color: var(--teal-lt); border-color: var(--teal-lt); }
+.vtab-panel { display: none; }
+.vtab-panel.active { display: block; animation: fadeUp 0.3s ease both; }
+
+/* ── Gallery cards ── */
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 28px 36px; }
+
+.unit-card { border-radius: 18px; overflow: hidden; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+.unit-card:hover { transform: translateY(-4px); }
+
+/* Card sections */
+.uc-head { padding: 18px 20px 14px; }
+.uc-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; }
+.uc-title { font-family: 'Bitter', serif; font-size: 20px; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 4px; }
+.uc-grade { font-size: 12px; opacity: 0.65; font-weight: 600; }
+
+.uc-body { padding: 16px 20px; }
+.uc-row { margin-bottom: 12px; }
+.uc-row:last-child { margin-bottom: 0; }
+.uc-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.uc-text { font-size: 12px; line-height: 1.6; color: rgba(240,245,240,0.82); }
+
+/* Unit 1 – Rainforest / Eritrea */
+.u1 .uc-head { background: linear-gradient(140deg, #1a3a28 0%, #2a5a38 100%); }
+.u1 .uc-eyebrow { color: #80d098; }
+.u1 .uc-body { background: rgba(26,58,40,0.55); border: 1px solid rgba(74,160,90,0.25); border-top: none; border-radius: 0 0 18px 18px; }
+.u1 .uc-label { color: #80d098; }
+
+/* Unit 2 – Orca */
+.u2 .uc-head { background: linear-gradient(140deg, #1a3050 0%, #2a5080 100%); }
+.u2 .uc-eyebrow { color: var(--ice); }
+.u2 .uc-body { background: rgba(26,48,80,0.55); border: 1px solid rgba(74,130,200,0.25); border-top: none; border-radius: 0 0 18px 18px; }
+.u2 .uc-label { color: var(--ice); }
+
+/* Unit 3 – LiP Seasonal */
+.u3 .uc-head { background: linear-gradient(140deg, #3a2808 0%, #5a4018 100%); }
+.u3 .uc-eyebrow { color: var(--straw); }
+.u3 .uc-body { background: rgba(58,40,8,0.55); border: 1px solid rgba(200,160,60,0.25); border-top: none; border-radius: 0 0 18px 18px; }
+.u3 .uc-label { color: var(--gold); }
+
+/* ── Stickies panel ── */
+.stickies-panel { padding: 0 36px 32px; }
+.sticky-instructions {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 14px 20px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.si-legend { display: flex; gap: 14px; }
+.si-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+.si-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.dot-green { background: rgba(74,184,100,0.6); }
+.dot-yellow { background: rgba(224,168,64,0.6); }
+.dot-red { background: rgba(204,88,56,0.6); }
+
+.stickies-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.sticky-col-head { font-size: 11px; font-weight: 800; color: var(--mist); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.stickies-list { display: flex; flex-direction: column; gap: 8px; min-height: 60px; margin-bottom: 12px; }
+
+.sticky-note {
+  border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.45;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  animation: stickyPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.sn-green { background: rgba(42,122,70,0.35); border: 1px solid rgba(74,184,100,0.35); color: #b0e0b8; }
+.sn-yellow { background: rgba(192,120,30,0.3); border: 1px solid rgba(224,168,64,0.35); color: var(--straw); }
+.sn-red { background: rgba(168,56,32,0.3); border: 1px solid rgba(204,88,56,0.35); color: var(--blush); }
+.sn-del { background: none; border: none; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; flex-shrink: 0; padding: 0; line-height: 1; transition: color 0.15s; }
+.sn-del:hover { color: rgba(255,255,255,0.6); }
+
+@keyframes stickyPop {
+  from { opacity: 0; transform: scale(0.6) rotate(-4deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.sticky-add-row { display: flex; gap: 6px; }
+.sticky-input {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 9px 12px; color: var(--snow);
+  font-family: 'Nunito', sans-serif; font-size: 12px; outline: none; transition: border-color 0.2s;
+}
+.sticky-input:focus { border-color: var(--teal-lt); }
+.sticky-input::placeholder { color: rgba(255,255,255,0.2); }
+.type-btn {
+  width: 34px; height: 34px; border-radius: 8px; border: 2px solid transparent;
+  font-size: 15px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+}
+.type-btn.active { outline: 2px solid white; outline-offset: 2px; }
+.btn-g { background: rgba(42,122,70,0.35); }
+.btn-y { background: rgba(192,120,30,0.3); }
+.btn-r { background: rgba(168,56,32,0.3); }
+.add-btn {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+  padding: 0 12px; color: var(--snow); font-size: 16px; cursor: pointer; transition: all 0.15s;
+}
+.add-btn:hover { background: rgba(255,255,255,0.14); }
+
+/* ── Discussion panel ── */
+.discussion-panel { padding: 0 36px 36px; }
+.disc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.dp {
+  border-radius: 14px; padding: 16px 20px;
+  border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+}
+.dp-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px; }
+.dp-teal .dp-label { color: var(--teal-lt); }
+.dp-gold .dp-label { color: var(--gold); }
+.dp-text { font-size: 13px; color: rgba(240,245,240,0.82); font-style: italic; line-height: 1.55; }
+
+.key-def {
+  background: rgba(42,122,106,0.1); border: 1px solid rgba(74,184,160,0.25);
+  border-radius: 14px; padding: 18px 22px; margin-bottom: 24px;
+}
+.kd-label { font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--teal-lt); margin-bottom: 8px; }
+.kd-text { font-family: 'Bitter', serif; font-size: 15px; font-style: italic; color: rgba(240,245,240,0.9); line-height: 1.65; }
+
+.sl { font-size: 11px; font-weight: 800; color: var(--fog); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="tag-row">
+      <div class="tag t-block">Block 6 · Activity 6.1</div>
+      <div class="tag t-method">Gallery Walk</div>
+    </div>
+    <h1>What Makes a Storyline?</h1>
+    <div class="header-sub">Three units compared — leave color-coded sticky reactions on each</div>
+    <div class="time-chip">⏱ 12 minutes</div>
+  </div>
+  <div class="timer-box">
+    <div class="timer-num" id="timer-num">12:00</div>
+    <div class="timer-label">Gallery walk timer</div>
+    <div class="timer-btns">
+      <button class="tbtn" onclick="toggleTimer()">▶ Start</button>
+      <button class="tbtn" onclick="resetTimer()">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="view-tabs">
+  <div class="vtab active" onclick="switchView('gallery',this)">🖼 Gallery</div>
+  <div class="vtab" onclick="switchView('stickies',this)">📌 Leave Reactions</div>
+  <div class="vtab" onclick="switchView('discuss',this)">🗣 Discuss</div>
+</div>
+
+<!-- GALLERY VIEW -->
+<div class="vtab-panel active" id="view-gallery">
+  <div class="gallery">
+
+    <!-- Unit 1 -->
+    <div class="unit-card u1">
+      <div class="uc-head">
+        <div class="uc-eyebrow">🌿 Phenomena-Driven Storyline</div>
+        <div class="uc-title">Rainforest &<br>Eritrea</div>
+        <div class="uc-grade">Grades 5–6 · San Francisco</div>
+      </div>
+      <div class="uc-body">
+        <div class="uc-row">
+          <div class="uc-label">Anchoring Phenomenon</div>
+          <div class="uc-text">Satellite images showing Eritrean forest loss over 40 years. "Why is this disappearing?"</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">What Drives the Sequence</div>
+          <div class="uc-text">Students' remaining questions after each investigation — teacher does not pre-script the path</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">Justice Move</div>
+          <div class="uc-text">Student raises: "Who took the resources first?" — colonization named as both science and civic root cause</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">Whose Knowledge?</div>
+          <div class="uc-text">Afar pastoralist land management practices cited as expert ecological knowledge; family farming histories as data</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unit 2 -->
+    <div class="unit-card u2">
+      <div class="uc-head">
+        <div class="uc-eyebrow">🐋 Community-Science Storyline</div>
+        <div class="uc-title">Orca Sound<br>Pollution</div>
+        <div class="uc-grade">Grades 4–5 · Pacific Northwest</div>
+      </div>
+      <div class="uc-body">
+        <div class="uc-row">
+          <div class="uc-label">Anchoring Phenomenon</div>
+          <div class="uc-text">Video of an orca circling in distress near container ships. "Why is she behaving this way?"</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">What Drives the Sequence</div>
+          <div class="uc-text">13 lessons across 7 lesson plans — each step driven by students' unanswered questions from previous investigations</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">Justice Move</div>
+          <div class="uc-text">Stage 5 = real letters to Port of Seattle; Lummi Nation's relationship to orca cited as sovereign knowledge, not background</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">Whose Knowledge?</div>
+          <div class="uc-text">Student data + scientific research + Indigenous fishing knowledge + shipping policy documents — all equal sources</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unit 3 -->
+    <div class="unit-card u3">
+      <div class="uc-head">
+        <div class="uc-eyebrow">🌾 Family & Community Storyline (LiP)</div>
+        <div class="uc-title">Seasonal<br>Change</div>
+        <div class="uc-grade">K–3 Mixed · Learning in Places</div>
+      </div>
+      <div class="uc-body">
+        <div class="uc-row">
+          <div class="uc-label">Anchoring Phenomenon</div>
+          <div class="uc-text">What seasonal changes do families in our community notice? Unit begins with family interviews — not a text or video</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">What Drives the Sequence</div>
+          <div class="uc-text">Family phenology observations, seasonal stories, and grandmother knowledge — community expertise organizes lessons</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">Justice Move</div>
+          <div class="uc-text">Family knowledge IS the primary data — not supplementary context. Community members present as scientific authorities</div>
+        </div>
+        <div class="uc-row">
+          <div class="uc-label">LiP Framework Dimensions</div>
+          <div class="uc-text">Nature-Culture Relations · Seasonal Change & Phenology · Family & Community Engagement · Ethical Deliberation</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STICKIES VIEW -->
+<div class="vtab-panel" id="view-stickies">
+  <div class="stickies-panel">
+    <div class="sticky-instructions">
+      <div class="si-legend">
+        <div class="si-item"><div class="si-dot dot-green"></div> 🟢 = I see justice</div>
+        <div class="si-item"><div class="si-dot dot-yellow"></div> 🟡 = I see phenomena-driven sequence</div>
+        <div class="si-item"><div class="si-dot dot-red"></div> 🔴 = I wonder...</div>
+      </div>
+      <div style="font-size:12px;color:var(--fog);margin-left:auto;">Leave at least ONE sticky per unit</div>
+    </div>
+
+    <div class="stickies-cols">
+      <div>
+        <div class="sticky-col-head">🌿 Rainforest / Eritrea Unit</div>
+        <div class="stickies-list" id="slist-0"></div>
+        <div class="sticky-add-row">
+          <input class="sticky-input" id="sinput-0" placeholder="Type your reaction..." onkeydown="if(event.key==='Enter')addSticky(0)">
+          <button class="type-btn btn-g active" id="sbtn-0-g" onclick="setType(0,'g',this)">🟢</button>
+          <button class="type-btn btn-y" id="sbtn-0-y" onclick="setType(0,'y',this)">🟡</button>
+          <button class="type-btn btn-r" id="sbtn-0-r" onclick="setType(0,'r',this)">🔴</button>
+          <button class="add-btn" onclick="addSticky(0)">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="sticky-col-head">🐋 Orca Unit</div>
+        <div class="stickies-list" id="slist-1"></div>
+        <div class="sticky-add-row">
+          <input class="sticky-input" id="sinput-1" placeholder="Type your reaction..." onkeydown="if(event.key==='Enter')addSticky(1)">
+          <button class="type-btn btn-g active" id="sbtn-1-g" onclick="setType(1,'g',this)">🟢</button>
+          <button class="type-btn btn-y" id="sbtn-1-y" onclick="setType(1,'y',this)">🟡</button>
+          <button class="type-btn btn-r" id="sbtn-1-r" onclick="setType(1,'r',this)">🔴</button>
+          <button class="add-btn" onclick="addSticky(1)">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="sticky-col-head">🌾 LiP Seasonal Unit</div>
+        <div class="stickies-list" id="slist-2"></div>
+        <div class="sticky-add-row">
+          <input class="sticky-input" id="sinput-2" placeholder="Type your reaction..." onkeydown="if(event.key==='Enter')addSticky(2)">
+          <button class="type-btn btn-g active" id="sbtn-2-g" onclick="setType(2,'g',this)">🟢</button>
+          <button class="type-btn btn-y" id="sbtn-2-y" onclick="setType(2,'y',this)">🟡</button>
+          <button class="type-btn btn-r" id="sbtn-2-r" onclick="setType(2,'r',this)">🔴</button>
+          <button class="add-btn" onclick="addSticky(2)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCUSS VIEW -->
+<div class="vtab-panel" id="view-discuss">
+  <div class="discussion-panel">
+    <div class="key-def">
+      <div class="kd-label">Definition: What Is a Storyline?</div>
+      <div class="kd-text">"A coherent sequence of lessons in which each step is driven by students' noticings, wonderings, and questions that arise from phenomena AND from their families and communities." <br><span style="font-size:13px;font-style:normal;color:var(--mist);">— Adapted from Next Gen Storylines / AST</span></div>
+    </div>
+
+    <div class="sl">Whole Class Discussion Prompts</div>
+    <div class="disc-grid">
+      <div class="dp dp-teal">
+        <div class="dp-label">Student-Driven</div>
+        <div class="dp-text">"Which unit feels most student-driven? What would schools need to change for this to be the norm — not the exception?"</div>
+      </div>
+      <div class="dp dp-gold">
+        <div class="dp-label">Family Phenomena</div>
+        <div class="dp-text">"The LiP unit begins with FAMILY observations, not a school text. What does that require of the teacher? Of the institution?"</div>
+      </div>
+      <div class="dp dp-teal">
+        <div class="dp-label">BPQs in Storylines</div>
+        <div class="dp-text">"Where in these storylines would Back-Pocket Questions be used? Which unit would make BPQs hardest to pre-plan — and why?"</div>
+      </div>
+      <div class="dp dp-gold">
+        <div class="dp-label">Your Placement</div>
+        <div class="dp-text">"In your placement school, what phenomenon would be scientifically rigorous AND connected to something families in that community are actually experiencing?"</div>
+      </div>
+      <div class="dp dp-teal">
+        <div class="dp-label">Justice in Each</div>
+        <div class="dp-text">"Look at the three 'Justice Moves.' Which one goes deepest? What makes the LiP version different from the Rainforest version?"</div>
+      </div>
+      <div class="dp dp-gold">
+        <div class="dp-label">Counternarrative</div>
+        <div class="dp-text">"Each of these units pushes against a mainstream narrative (deforestation is just poverty; orcas are just endangered; seasons are just weather). What is the counternarrative — and why does it matter?"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const types = ['g','g','g'];
+const stickies = [[],[],[]];
+let timerSec = 12*60, timerRunning = false, timerInterval = null;
+
+function switchView(name, el) {
+  document.querySelectorAll('.vtab,.vtab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function setType(unit, type, btn) {
+  types[unit] = type;
+  ['g','y','r'].forEach(t => document.getElementById(`sbtn-${unit}-${t}`)?.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function addSticky(unit) {
+  const input = document.getElementById('sinput-'+unit);
+  const text = input.value.trim();
+  if (!text) return;
+  const type = types[unit];
+  stickies[unit].push({ text, type });
+  input.value = '';
+  renderStickies(unit);
+}
+
+function deleteSticky(unit, idx) {
+  stickies[unit].splice(idx, 1);
+  renderStickies(unit);
+}
+
+function renderStickies(unit) {
+  const list = document.getElementById('slist-'+unit);
+  const CLASS = { g:'sn-green', y:'sn-yellow', r:'sn-red' };
+  list.innerHTML = stickies[unit].map((s,i) => `
+    <div class="sticky-note ${CLASS[s.type]}">
+      <span>${s.text}</span>
+      <button class="sn-del" onclick="deleteSticky(${unit},${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function toggleTimer() {
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+  else {
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timerSec--;
+      const m = Math.floor(timerSec/60), s = timerSec%60;
+      document.getElementById('timer-num').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (timerSec <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById('timer-num').style.color = 'var(--terra)';
+      }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSec = 12*60;
+  document.getElementById('timer-num').textContent = '12:00';
+  document.getElementById('timer-num').style.color = '';
+}
+</script>
+</body>
+</html>

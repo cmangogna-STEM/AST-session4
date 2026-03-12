@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 2.1 — Word Bank vs Must-Have Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep:#1B3A4B;--teal:#2E6B7A;--sage:#5E8A6E;--gold:#D4894A;--rust:#B25C3A;
+    --cream:#FBF8F2;--lt-teal:#E8F2F5;--lt-gold:#FDF3E9;--white:#fff;--dark:#1A2830;
+    --muted:#7a8a90;--lt-sage:#A8C5B0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);min-height:100vh;}
+
+  .header{background:var(--deep);padding:28px 40px 20px;border-bottom:3px solid var(--teal);}
+  .block-tag{display:inline-block;background:var(--rust);color:var(--white);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:10px;}
+  .header h1{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--white);margin-bottom:4px;}
+  .header p{color:var(--lt-sage);font-size:14px;}
+  .time-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(178,92,58,0.2);border:1px solid rgba(178,92,58,0.4);color:#f5a07a;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:8px;}
+
+  .main{max-width:1000px;margin:0 auto;padding:32px 32px;}
+
+  /* Compare panel */
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;}
+  .scaffold-card{border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);}
+  .scaffold-header{padding:16px 20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+  .scaffold-body{background:var(--white);padding:22px 24px;min-height:220px;}
+
+  .weak-header{background:var(--rust);color:var(--white);}
+  .strong-header{background:var(--sage);color:var(--white);}
+
+  /* Word bank visual */
+  .word-bank-box{border:2px solid #ccc;border-radius:8px;padding:16px;margin-top:12px;}
+  .word-bank-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .word-bank-words{display:flex;flex-wrap:wrap;gap:8px;}
+  .wb-word{background:var(--lt-teal);border:1px solid #b0d4dc;border-radius:6px;padding:5px 12px;font-size:13px;font-weight:600;color:var(--teal);}
+
+  .scaffold-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+
+  /* Must-Have visual */
+  .mhc-box{border:2px solid var(--sage);border-radius:10px;padding:18px 20px;margin-top:4px;}
+  .mhc-title{font-size:12px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+  .mhc-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #e8f2ec;}
+  .mhc-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .mhc-check{width:20px;height:20px;border:2px solid var(--sage);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;}
+  .mhc-check.checked{background:var(--sage);border-color:var(--sage);}
+  .mhc-check.checked::after{content:'✓';color:white;font-size:12px;font-weight:700;}
+  .mhc-text{font-size:13px;color:var(--dark);line-height:1.4;}
+
+  /* Analysis area */
+  .analysis-section{background:var(--deep);border-radius:16px;padding:28px 32px;margin-bottom:28px;}
+  .analysis-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:20px;}
+  .chat-stem{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:18px 22px;margin-bottom:16px;}
+  .stem-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .stem-text{font-size:16px;color:var(--white);font-style:italic;margin-bottom:12px;line-height:1.5;}
+  textarea{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:80px;outline:none;transition:border-color 0.2s;}
+  textarea:focus{border-color:var(--teal);}
+  textarea::placeholder{color:rgba(255,255,255,0.3);}
+
+  .submit-response{background:var(--gold);color:var(--dark);font-weight:700;font-size:14px;border:none;border-radius:8px;padding:10px 24px;cursor:pointer;margin-top:10px;transition:all 0.15s;}
+  .submit-response:hover{transform:translateY(-1px);}
+
+  /* Reactions */
+  .reaction-row{display:flex;gap:10px;margin-top:14px;}
+  .react-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 16px;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+  .react-btn:hover,.react-btn.active{background:rgba(212,137,74,0.2);border-color:var(--gold);color:var(--gold);}
+  .react-count{font-weight:700;}
+
+  /* Discussion */
+  .prompt-card{background:rgba(255,255,255,0.04);border-left:4px solid var(--sage);border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:12px;}
+  .prompt-label{font-size:10px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+  .prompt-text{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.5;font-style:italic;}
+
+  .justice-box{background:rgba(94,138,110,0.12);border:1px solid rgba(94,138,110,0.3);border-radius:12px;padding:18px 22px;margin-top:16px;}
+  .justice-label{font-size:11px;font-weight:700;color:var(--lt-sage);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .justice-text{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{padding:9px 18px;border-radius:8px;border:1px solid rgba(0,0,0,0.1);background:rgba(0,0,0,0.04);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:var(--teal);border-color:var(--teal);color:var(--white);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:fadeUp 0.3s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="block-tag">Block 2 · Activity 2.1</div>
+  <h1>Word Bank vs. Must-Have Checklist</h1>
+  <p>Model critique — what's the difference and why does it matter?</p>
+  <div class="time-badge">⏱ 10 minutes &nbsp;·&nbsp; Model Critique + Chat</div>
+</div>
+
+<div class="main">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('compare',this)">🔍 Compare</div>
+    <div class="tab" onclick="switchTab('respond',this)">✍️ Respond</div>
+    <div class="tab" onclick="switchTab('discuss',this)">🗣 Discuss</div>
+  </div>
+
+  <!-- COMPARE -->
+  <div class="tab-panel active" id="tab-compare">
+    <div class="compare-grid">
+      <div class="scaffold-card">
+        <div class="scaffold-header weak-header">⚠ Scaffold A — Word Bank</div>
+        <div class="scaffold-body">
+          <div class="scaffold-desc">Students are asked to explain why Englewood is hotter than Lincoln Park. They receive this scaffold to help them write:</div>
+          <div class="word-bank-box">
+            <div class="word-bank-title">Word Bank</div>
+            <div class="word-bank-words">
+              <div class="wb-word">Albedo</div>
+              <div class="wb-word">Concrete</div>
+              <div class="wb-word">Heat</div>
+              <div class="wb-word">Temperature</div>
+              <div class="wb-word">Surface</div>
+              <div class="wb-word">Solar radiation</div>
+              <div class="wb-word">Urban</div>
+              <div class="wb-word">Vegetation</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#fdf0ee;border-radius:8px;font-size:12px;color:var(--rust);line-height:1.5;">
+            <strong>What this requires:</strong> Students select and insert vocabulary words. The scaffold provides the terms — students do not need to understand mechanisms to succeed.
+          </div>
+        </div>
+      </div>
+
+      <div class="scaffold-card">
+        <div class="scaffold-header strong-header">✓ Scaffold B — Must-Have Checklist</div>
+        <div class="scaffold-body">
+          <div class="scaffold-desc">Students co-create this checklist during class, recalling what they learned throughout the unit:</div>
+          <div class="mhc-box">
+            <div class="mhc-title">Our Must-Have Checklist — Urban Heat Island</div>
+            <div class="mhc-item">
+              <div class="mhc-check" onclick="toggleCheck(this)"></div>
+              <div class="mhc-text">I explain how dark surfaces absorb more solar energy than light or green surfaces</div>
+            </div>
+            <div class="mhc-item">
+              <div class="mhc-check" onclick="toggleCheck(this)"></div>
+              <div class="mhc-text">I use at least two pieces of data we collected in my explanation</div>
+            </div>
+            <div class="mhc-item">
+              <div class="mhc-check" onclick="toggleCheck(this)"></div>
+              <div class="mhc-text">I connect to what residents told us about nighttime heat</div>
+            </div>
+            <div class="mhc-item">
+              <div class="mhc-check" onclick="toggleCheck(this)"></div>
+              <div class="mhc-text">I explain WHY some neighborhoods have more concrete than others</div>
+            </div>
+            <div class="mhc-item">
+              <div class="mhc-check" onclick="toggleCheck(this)"></div>
+              <div class="mhc-text">I suggest what could change to make the heat more equal</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#eef5f0;border-radius:8px;font-size:12px;color:var(--sage);line-height:1.5;">
+            <strong>What this requires:</strong> Students must recall, reason, and connect. Each item is a relational statement — a claim about mechanism or evidence, not a vocabulary word.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--lt-gold);border:1px solid rgba(212,137,74,0.3);border-radius:12px;padding:18px 22px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Key Insight from Kang, Thompson & Windschitl (2016)</div>
+      <div style="font-size:14px;color:var(--dark);line-height:1.6;">Must-Have Checklists are <strong>co-created scaffolds</strong> that "prompt students to show more of what they know" and "provide multiple linguistic entry points" — including translanguaging, drawing, labeling, and gesturing. They <em>support</em> explanation without <em>replacing</em> it.</div>
+    </div>
+  </div>
+
+  <!-- RESPOND -->
+  <div class="tab-panel" id="tab-respond">
+    <div class="analysis-section">
+      <div class="analysis-title">Your Turn — Respond in the Chat</div>
+      <div class="chat-stem">
+        <div class="stem-label">Chat Stem</div>
+        <div class="stem-text">"The key difference I notice is..."</div>
+        <textarea placeholder="Complete the sentence here — then share in Zoom chat..."></textarea>
+        <button class="submit-response" onclick="this.textContent='✓ Shared!';this.style.background='var(--sage)';">Share Response</button>
+      </div>
+
+      <div class="chat-stem">
+        <div class="stem-label">Justice Lens</div>
+        <div class="stem-text">"A student who speaks Spanish as their home language would benefit from the Must-Have Checklist because..."</div>
+        <textarea placeholder="Think about multiple linguistic entry points — drawing, labeling, gesturing..."></textarea>
+        <button class="submit-response" onclick="this.textContent='✓ Shared!';this.style.background='var(--sage)';">Share Response</button>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:12px;">React (like Zoom reactions)</div>
+        <div class="reaction-row">
+          <div class="react-btn" onclick="addReaction(this,'⭐')"><span>⭐</span><span class="react-count">0</span></div>
+          <div class="react-btn" onclick="addReaction(this,'❓')"><span>❓</span><span class="react-count">0</span></div>
+          <div class="react-btn" onclick="addReaction(this,'💡')"><span>💡</span><span class="react-count">0</span></div>
+          <div class="react-btn" onclick="addReaction(this,'🤔')"><span>🤔</span><span class="react-count">0</span></div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">⭐ = I've seen this in placement &nbsp; ❓ = Not sure when I'd use this</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCUSS -->
+  <div class="tab-panel" id="tab-discuss">
+    <div class="analysis-section">
+      <div class="analysis-title">Discussion Prompts</div>
+      <div class="prompt-card">
+        <div class="prompt-label">Opening</div>
+        <div class="prompt-text">"Look at Scaffold A vs B — what's the key difference? The chat stem is: 'The key difference I notice is...'"</div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-label">Equity Lens</div>
+        <div class="prompt-text">"A student who speaks Spanish as their home language is in your class. How does the Must-Have Checklist support them differently than a word bank?"</div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-label">Developmental</div>
+        <div class="prompt-text">"Could you co-create a Must-Have Checklist with 1st graders? What would it look like? What would you keep? What would you change?"</div>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt-label">Risk Check</div>
+        <div class="prompt-text">"What's the risk of making the checklist too detailed? What happens to student agency if every item is prescribed?"</div>
+      </div>
+      <div class="justice-box">
+        <div class="justice-label">Justice-Centered Element</div>
+        <div class="justice-text">The Must-Have Checklist is explicitly framed by Kang et al. (2016) as a <strong>linguistic equity tool</strong>. It disrupts the assumption that only written academic English demonstrates scientific understanding. Items can be shown through drawing, gesture, multilingual writing, and oral explanation — broadening who gets to "show what they know."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.tab,.tab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+function addReaction(btn, emoji) {
+  const count = btn.querySelector('.react-count');
+  count.textContent = parseInt(count.textContent) + 1;
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

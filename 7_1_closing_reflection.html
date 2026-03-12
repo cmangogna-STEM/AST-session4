@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 7.1 — Closing Reflection & Commitment</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08100c; --s1: #0f1a14; --s2: #172218; --s3: #1e2e20;
+  --green: #2a6a40; --leaf: #4aaa68; --sage: #7ad898;
+  --amber: #b87830; --gold: #d8a840; --straw: #f0d890;
+  --deep: #0a1a10; --fog: #4a6858; --mist: #80a890; --snow: #eef5f0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--snow);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Atmospheric background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(42,106,64,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 10%, rgba(184,120,48,0.08) 0%, transparent 60%);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  padding: 48px 40px 36px;
+  position: relative;
+}
+.block-tag {
+  display: inline-block;
+  background: var(--green); color: var(--sage);
+  font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  padding: 5px 16px; border-radius: 100px; margin-bottom: 18px;
+}
+.header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+  color: var(--snow);
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.header-sub {
+  font-size: 15px;
+  color: var(--mist);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Main layout ── */
+.main { max-width: 900px; margin: 0 auto; padding: 0 36px 60px; }
+
+/* ── Phase tabs ── */
+.phase-nav {
+  display: flex; gap: 0;
+  background: var(--s1); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; overflow: hidden;
+  margin-bottom: 32px;
+}
+.pnav-item {
+  flex: 1; padding: 14px 16px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  cursor: pointer; transition: all 0.2s;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4);
+}
+.pnav-item:last-child { border-right: none; }
+.pnav-item.active { background: var(--green); color: var(--snow); }
+.pnav-item .pn-icon { display: block; font-size: 20px; margin-bottom: 4px; }
+.panel { display: none; animation: fadeUp 0.35s ease both; }
+.panel.active { display: block; }
+
+/* ── Phase 1: Return to Driving Questions ── */
+.dq-return { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+.dq-card {
+  border-radius: 16px; overflow: hidden;
+  transition: transform 0.2s;
+}
+.dq-card:hover { transform: translateX(4px); }
+.dq-inner { display: grid; grid-template-columns: 72px 1fr; }
+.dq-num { display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 36px; font-weight: 900; }
+.dq-1 .dq-num { background: rgba(42,106,64,0.5); color: rgba(122,216,152,0.4); }
+.dq-2 .dq-num { background: rgba(184,120,48,0.4); color: rgba(240,216,144,0.4); }
+.dq-content { padding: 18px 22px; }
+.dq-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; }
+.dq-1 .dq-content { background: rgba(42,106,64,0.15); border: 1px solid rgba(74,170,104,0.2); border-left: none; border-radius: 0 16px 16px 0; }
+.dq-2 .dq-content { background: rgba(184,120,48,0.12); border: 1px solid rgba(216,168,64,0.2); border-left: none; border-radius: 0 16px 16px 0; }
+.dq-1 .dq-label { color: var(--sage); }
+.dq-2 .dq-label { color: var(--straw); }
+.dq-text { font-family: 'Fraunces', serif; font-size: 17px; font-style: italic; color: var(--snow); line-height: 1.45; margin-bottom: 12px; }
+.dq-reflect-label { font-size: 11px; font-weight: 700; color: var(--mist); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+textarea {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 10px 14px; color: var(--snow);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; resize: none;
+  min-height: 72px; outline: none; line-height: 1.5; transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--leaf); }
+textarea::placeholder { color: rgba(255,255,255,0.22); font-style: italic; }
+
+/* ── Phase 2: Commitment Stems ── */
+.stems-intro {
+  background: rgba(42,106,64,0.1); border: 1px solid rgba(74,170,104,0.2);
+  border-radius: 14px; padding: 16px 20px; margin-bottom: 22px;
+  font-size: 14px; color: rgba(240,245,240,0.85); line-height: 1.6;
+}
+.stems-intro strong { color: var(--sage); }
+
+.stem-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.stem-item {
+  background: var(--s2); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 16px 20px;
+}
+.stem-prompt {
+  font-family: 'Fraunces', serif; font-size: 15px; font-style: italic;
+  color: var(--snow); margin-bottom: 10px; line-height: 1.4;
+}
+.stem-prompt span { color: var(--sage); text-decoration: underline dotted; }
+.stem-input {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 9px 13px; color: var(--snow);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s;
+}
+.stem-input:focus { border-color: var(--leaf); }
+.stem-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+
+.share-btn {
+  display: block; width: 100%;
+  background: var(--green); color: var(--snow); border: none; border-radius: 12px;
+  padding: 14px; font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 8px;
+}
+.share-btn:hover { background: #357a50; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(42,106,64,0.35); }
+
+/* ── Phase 3: Hope Wall ── */
+.kaba-quote {
+  text-align: center;
+  background: linear-gradient(180deg, rgba(42,106,64,0.15) 0%, transparent 100%);
+  border: 1px solid rgba(74,170,104,0.2);
+  border-radius: 20px; padding: 36px 40px; margin-bottom: 32px;
+}
+.kq-text {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 900; font-style: italic;
+  color: var(--snow); line-height: 1.3; margin-bottom: 12px;
+}
+.kq-text span { color: var(--sage); }
+.kq-attr { font-size: 13px; color: var(--mist); font-weight: 600; letter-spacing: 1px; }
+.kq-sub { font-size: 13px; color: var(--fog); margin-top: 6px; }
+
+.hope-wall-grid { display: flex; flex-wrap: wrap; gap: 12px; min-height: 120px; margin-bottom: 20px; align-content: flex-start; }
+.hope-card {
+  background: var(--s2); border: 1px solid rgba(74,170,104,0.25);
+  border-radius: 12px; padding: 12px 16px;
+  font-size: 13px; color: var(--snow); line-height: 1.45;
+  max-width: 220px;
+  animation: cardPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  cursor: default;
+}
+.hc-name { font-size: 10px; font-weight: 700; color: var(--sage); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+@keyframes cardPop { from{opacity:0;transform:scale(0.7) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);} }
+
+.hope-input-row { display: flex; gap: 10px; }
+.hope-name-input { width: 140px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 12px; color: var(--snow); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; flex-shrink: 0; }
+.hope-name-input::placeholder { color: rgba(255,255,255,0.2); }
+.hope-text-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; color: var(--snow); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
+.hope-text-input:focus { border-color: var(--leaf); }
+.hope-text-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+.hope-add-btn { background: var(--leaf); color: var(--deep); border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.hope-add-btn:hover { background: var(--sage); }
+
+/* ── Phase 4: Eco-emotion quickwrite ── */
+.emotion-flow {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 28px; background: var(--s1);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden;
+}
+.ef-step { flex: 1; padding: 18px 20px; text-align: center; }
+.ef-step:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.07); }
+.ef-icon { font-size: 28px; margin-bottom: 6px; }
+.ef-word { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+.ef-desc { font-size: 11px; color: var(--fog); line-height: 1.4; }
+.ef-arrow { padding: 0; font-size: 20px; color: var(--fog); flex-shrink: 0; width: 32px; display: flex; align-items: center; justify-content: center; }
+
+.quickwrite-box { background: var(--s2); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px 26px; margin-bottom: 20px; }
+.qw-prompt { font-family: 'Fraunces', serif; font-size: 16px; font-style: italic; color: var(--snow); margin-bottom: 14px; line-height: 1.5; }
+.qw-prompt span { color: var(--straw); }
+textarea.qw-area { min-height: 100px; }
+
+.freire-quote {
+  text-align: center; padding: 24px; border-top: 1px solid rgba(255,255,255,0.07); margin-top: 32px;
+}
+.fq-text { font-family: 'Fraunces', serif; font-size: 18px; font-style: italic; color: var(--mist); line-height: 1.5; }
+.fq-attr { font-size: 12px; color: var(--fog); margin-top: 8px; font-weight: 600; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="block-tag">Block 7 · Closing Reflection</div>
+  <h1>Hope Is a Discipline</h1>
+  <p class="header-sub">Return to our driving questions. Make a commitment. Leave something on the Hope Wall.</p>
+</div>
+
+<div class="main">
+
+  <!-- Phase nav -->
+  <div class="phase-nav">
+    <div class="pnav-item active" onclick="goPhase(0,this)">
+      <span class="pn-icon">🔍</span>Return to DQs
+    </div>
+    <div class="pnav-item" onclick="goPhase(1,this)">
+      <span class="pn-icon">✍️</span>Commitment
+    </div>
+    <div class="pnav-item" onclick="goPhase(2,this)">
+      <span class="pn-icon">🌱</span>Hope Wall
+    </div>
+    <div class="pnav-item" onclick="goPhase(3,this)">
+      <span class="pn-icon">💚</span>Eco-emotion
+    </div>
+  </div>
+
+  <!-- Phase 1: Return to Driving Questions -->
+  <div class="panel active" id="phase-0">
+    <div style="font-size:11px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">We started with these — how has your thinking shifted?</div>
+    <div class="dq-return">
+      <div class="dq-card dq-1">
+        <div class="dq-inner">
+          <div class="dq-num">1</div>
+          <div class="dq-content">
+            <div class="dq-label">Pedagogical Practice</div>
+            <div class="dq-text">"How do we support students to revise their thinking — without giving the answer away?"</div>
+            <div class="dq-reflect-label">My thinking has shifted:</div>
+            <textarea placeholder="Before today I thought... Now I think... The thing that changed it was..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="dq-card dq-2">
+        <div class="dq-inner">
+          <div class="dq-num">2</div>
+          <div class="dq-content">
+            <div class="dq-label">Justice-Centered Teaching</div>
+            <div class="dq-text">"What does it mean to teach climate change as a justice issue — not just a science issue?"</div>
+            <div class="dq-reflect-label">My thinking has shifted:</div>
+            <textarea placeholder="Before today I thought... Now I think... The thing that changed it was..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="share-btn" onclick="goPhase(1, document.querySelectorAll('.pnav-item')[1])">Next: Make a Commitment →</button>
+  </div>
+
+  <!-- Phase 2: Commitment Stems -->
+  <div class="panel" id="phase-1">
+    <div class="stems-intro">
+      <strong>Chat Waterfall — release together.</strong> Complete one or more stems below, then paste your commitment into the Zoom chat when the facilitator says GO. Don't hit enter until the countdown.
+    </div>
+
+    <div class="stem-list">
+      <div class="stem-item">
+        <div class="stem-prompt">"This week in my placement, I will try <span>one Stage 3 move</span>: specifically..."</div>
+        <input type="text" class="stem-input" placeholder="e.g. 'I'll use wait time — I'll count to 8 before I call on anyone after asking a question...'">
+      </div>
+      <div class="stem-item">
+        <div class="stem-prompt">"The Back-Pocket Question I'm going to carry into class this week is: <span>..."</span></div>
+        <input type="text" class="stem-input" placeholder="Write a WHY-level question ready for the next time a student says something worth pressing on...">
+      </div>
+      <div class="stem-item">
+        <div class="stem-prompt">"The justice move I'm most committed to trying is <span>...</span> because..."</div>
+        <input type="text" class="stem-input" placeholder="e.g. 'centering community knowledge as data, because I saw today how quickly it elevates what counts as scientific evidence...'">
+      </div>
+      <div class="stem-item">
+        <div class="stem-prompt">"One thing from today I want to bring to my <span>cooperating teacher</span> is..."</div>
+        <input type="text" class="stem-input" placeholder="A resource, a question, a strategy — something specific you'll actually share this week...">
+      </div>
+    </div>
+
+    <button class="share-btn" onclick="copyCommitments()">🌊 Copy All Commitments for Chat Waterfall</button>
+    <div id="copy-confirm" style="text-align:center;margin-top:10px;font-size:13px;color:var(--sage);display:none;">✓ Copied! Paste in Zoom chat when the facilitator says GO.</div>
+  </div>
+
+  <!-- Phase 3: Hope Wall -->
+  <div class="panel" id="phase-2">
+    <div class="kaba-quote">
+      <div class="kq-text">"<span>Hope is a discipline.</span>"</div>
+      <div class="kq-attr">— Mariame Kaba</div>
+      <div class="kq-sub">We are going to teach like there is a tomorrow.</div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Leave a hope for the students you'll teach — add it to the wall</div>
+
+    <div class="hope-wall-grid" id="hope-wall"></div>
+
+    <div class="hope-input-row">
+      <input type="text" class="hope-name-input" id="hope-name" placeholder="Your name...">
+      <input type="text" class="hope-text-input" id="hope-text" placeholder="My hope for my future students: ..." onkeydown="if(event.key==='Enter')addHope()">
+      <button class="hope-add-btn" onclick="addHope()">Add →</button>
+    </div>
+
+    <div style="text-align:center;margin-top:32px;">
+      <button onclick="loadSampleHopes()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 18px;color:rgba(255,255,255,0.45);font-size:12px;cursor:pointer;">Load sample hopes (demo)</button>
+    </div>
+  </div>
+
+  <!-- Phase 4: Eco-emotion quickwrite -->
+  <div class="panel" id="phase-3">
+    <div class="emotion-flow">
+      <div class="ef-step">
+        <div class="ef-icon">😰</div>
+        <div class="ef-word">Anxiety</div>
+        <div class="ef-desc">What you feel about climate change and teaching it</div>
+      </div>
+      <div class="ef-arrow">→</div>
+      <div class="ef-step">
+        <div class="ef-icon">🔍</div>
+        <div class="ef-word">Naming</div>
+        <div class="ef-desc">What specifically creates that feeling?</div>
+      </div>
+      <div class="ef-arrow">→</div>
+      <div class="ef-step">
+        <div class="ef-icon">🌱</div>
+        <div class="ef-word">Hope</div>
+        <div class="ef-desc">Not optimism — disciplined, active hope</div>
+      </div>
+      <div class="ef-arrow">→</div>
+      <div class="ef-step">
+        <div class="ef-icon">🔥</div>
+        <div class="ef-word">Action</div>
+        <div class="ef-desc">What will you do with that hope this week?</div>
+      </div>
+    </div>
+
+    <div class="quickwrite-box">
+      <div class="qw-prompt">Complete the eco-emotion arc for yourself as a teacher:<br>
+        "When I think about teaching climate justice, I feel <span>[emotion]</span> because... But I also notice <span>[hope signal]</span>... So this week I will..."
+      </div>
+      <textarea class="qw-area" placeholder="Write for yourself first — this doesn't have to be shared. Let yourself feel both the weight and the possibility..."></textarea>
+    </div>
+
+    <div style="background:rgba(184,120,48,0.1);border:1px solid rgba(216,168,64,0.2);border-radius:14px;padding:18px 22px;margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:700;color:var(--straw);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Facilitator Note</div>
+      <div style="font-size:13px;color:rgba(240,245,240,0.82);line-height:1.6;">After 3 minutes of writing, invite 2–3 people to share their <strong>hope signal</strong> — not their anxiety. End with Freire's frame: <em>Esperançar.</em> Hope is not a feeling — it's a practice. It requires action to exist.</div>
+    </div>
+
+    <div class="freire-quote">
+      <div class="fq-text">"Esperançar is to hope, yes — but not just to hope. It is to go looking for hope with hands and feet."</div>
+      <div class="fq-attr">— Paulo Freire</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const hopes = [];
+
+function goPhase(n, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.pnav-item').forEach(p=>p.classList.remove('active'));
+  document.getElementById('phase-'+n).classList.add('active');
+  el.classList.add('active');
+}
+
+function addHope() {
+  const name = document.getElementById('hope-name').value.trim() || 'Anonymous';
+  const text = document.getElementById('hope-text').value.trim();
+  if (!text) return;
+  hopes.push({ name, text });
+  document.getElementById('hope-text').value = '';
+  renderHopes();
+}
+
+function renderHopes() {
+  const wall = document.getElementById('hope-wall');
+  wall.innerHTML = hopes.map(h => `
+    <div class="hope-card">
+      <div class="hc-name">${h.name}</div>
+      ${h.text}
+    </div>
+  `).join('');
+}
+
+function loadSampleHopes() {
+  const samples = [
+    { name: 'Priya', text: 'That they feel brave enough to ask the hard questions — about who made decisions and who lives with them.' },
+    { name: 'Marcus', text: 'That science class feels like a place where their family\'s knowledge belongs, not just textbook knowledge.' },
+    { name: 'Dana', text: 'That they leave my class believing they can do something real — not just learn about problems.' },
+    { name: 'Keiko', text: 'That they see themselves as scientists who notice things about the world that matter.' },
+    { name: 'Sam', text: 'That uncertainty doesn\'t scare them — that they\'ve learned to sit with a question long enough to understand it.' },
+    { name: 'Rivera', text: 'That the word "justice" feels connected to the word "science" forever after.' },
+  ];
+  samples.forEach(s => hopes.push(s));
+  renderHopes();
+}
+
+function copyCommitments() {
+  const inputs = document.querySelectorAll('.stem-input');
+  const stems = [
+    'This week in my placement, I will try one Stage 3 move: specifically...',
+    'The Back-Pocket Question I\'m going to carry is:',
+    'The justice move I\'m most committed to trying is...',
+    'One thing I want to bring to my cooperating teacher:'
+  ];
+  const lines = [];
+  inputs.forEach((inp, i) => {
+    if (inp.value.trim()) lines.push(`${stems[i]} ${inp.value.trim()}`);
+  });
+  if (!lines.length) { alert('Complete at least one commitment stem first!'); return; }
+  navigator.clipboard.writeText(lines.join('\n\n')).catch(() => {
+    const dummy = document.createElement('textarea');
+    dummy.value = lines.join('\n\n');
+    document.body.appendChild(dummy);
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+  });
+  document.getElementById('copy-confirm').style.display = 'block';
+  setTimeout(() => document.getElementById('copy-confirm').style.display = 'none', 4000);
+}
+</script>
+</body>
+</html>

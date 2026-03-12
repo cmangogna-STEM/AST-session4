@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 6.2 — Back-Pocket Questions Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f1820;--surface:#141f2a;--card:#1c2a38;--raised:#243040;
+    --teal:#2a8090;--teal-lt:#4ab8c8;--teal-pale:#a0d8e0;
+    --amber:#d48030;--sun:#e8b040;--straw:#f8e098;
+    --rust:#b84030;--terracotta:#d86050;
+    --sage:#3a7a50;--leaf:#60b070;
+    --fog:#607080;--mist:#90a8b8;--snow:#f0f4f8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--snow); min-height: 100vh; }
+
+  .header { background: var(--surface); border-bottom: 2px solid rgba(74,184,200,0.2); padding: 22px 40px; }
+  .tag-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .t1 { background: var(--teal); color: var(--snow); }
+  .t2 { background: rgba(212,128,48,0.2); border: 1px solid rgba(232,176,64,0.4); color: var(--sun); }
+  h1 { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 900; color: var(--snow); margin-bottom: 4px; }
+  .header-sub { color: var(--fog); font-size: 13px; }
+  .time-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,184,200,0.1); border: 1px solid rgba(74,184,200,0.2); color: var(--teal-lt); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 100px; margin-top: 8px; }
+
+  .main { max-width: 1000px; margin: 0 auto; padding: 28px 40px; }
+
+  /* What-How-Why explainer */
+  .whw-ladder { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+  .whw-step { border-radius: 14px; overflow: hidden; }
+  .whw-head { padding: 16px 18px; text-align: center; }
+  .whw-word { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; display: block; margin-bottom: 4px; }
+  .whw-level { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; opacity: 0.8; }
+  .whw-body { padding: 14px 18px; font-size: 13px; line-height: 1.55; color: rgba(255,255,255,0.8); }
+  .whw-example { font-style: italic; font-size: 12px; margin-top: 8px; opacity: 0.7; }
+  .step-what .whw-head { background: rgba(42,128,144,0.3); }
+  .step-what .whw-word { color: var(--teal-lt); }
+  .step-what .whw-body { background: rgba(42,128,144,0.1); }
+  .step-how .whw-head { background: rgba(212,128,48,0.25); }
+  .step-how .whw-word { color: var(--sun); }
+  .step-how .whw-body { background: rgba(212,128,48,0.08); }
+  .step-why .whw-head { background: rgba(184,64,48,0.3); }
+  .step-why .whw-word { color: var(--terracotta); }
+  .step-why .whw-body { background: rgba(184,64,48,0.1); }
+  .arrow { display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--fog); }
+
+  /* Statement picker */
+  .picker-section { margin-bottom: 24px; }
+  .section-label { font-size: 11px; font-weight: 700; color: var(--fog); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .statement-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stmt-chip { background: var(--card); border: 2px solid transparent; border-radius: 10px; padding: 10px 16px; cursor: pointer; transition: all 0.2s; font-size: 13px; }
+  .stmt-chip:hover { border-color: rgba(74,184,200,0.4); }
+  .stmt-chip.active { border-color: var(--teal); background: rgba(42,128,144,0.15); }
+  .stmt-label { font-size: 10px; font-weight: 700; color: var(--teal-lt); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .stmt-text { color: var(--snow); font-size: 13px; line-height: 1.4; font-style: italic; }
+
+  /* BPQ builder */
+  .bpq-builder { background: var(--surface); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 28px; margin-bottom: 24px; }
+  .builder-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--snow); margin-bottom: 6px; }
+  .builder-sub { font-size: 13px; color: var(--fog); margin-bottom: 20px; }
+
+  .bpq-row { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+  .bpq-level-tag { border-radius: 8px; padding: 8px 10px; text-align: center; }
+  .lvl-what { background: rgba(42,128,144,0.25); color: var(--teal-lt); }
+  .lvl-how { background: rgba(212,128,48,0.25); color: var(--sun); }
+  .lvl-why { background: rgba(184,64,48,0.25); color: var(--terracotta); }
+  .lvl-word { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 900; display: block; }
+  .lvl-desc { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-top: 2px; }
+  .bpq-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 11px 14px; color: var(--snow); font-family: 'DM Sans', sans-serif; font-size: 14px; resize: none; outline: none; min-height: 60px; line-height: 1.5; transition: border-color 0.2s; }
+  .bpq-input.what:focus { border-color: var(--teal); }
+  .bpq-input.how:focus { border-color: var(--amber); }
+  .bpq-input.why:focus { border-color: var(--rust); }
+  .bpq-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+  .eval-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .eval-btn:hover { background: rgba(255,255,255,0.1); color: var(--snow); }
+
+  .depth-badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 12px; padding: 4px 10px; font-size: 11px; font-weight: 700; margin-top: 4px; }
+  .depth-observable { background: rgba(74,184,200,0.15); color: var(--teal-lt); }
+  .depth-mechanism { background: rgba(96,176,112,0.15); color: #90d4a0; }
+  .depth-partial { background: rgba(232,176,64,0.15); color: var(--sun); }
+  .depth-shallow { background: rgba(184,64,48,0.15); color: var(--terracotta); }
+
+  /* Peer swap */
+  .swap-section { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; }
+  .swap-title { font-size: 14px; font-weight: 700; color: var(--snow); margin-bottom: 8px; }
+  .swap-sub { font-size: 13px; color: var(--fog); margin-bottom: 14px; }
+  .peer-feedback { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pf-card { background: var(--card); border-radius: 12px; padding: 14px 16px; }
+  .pf-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .pf-1 .pf-label { color: var(--teal-lt); }
+  .pf-2 .pf-label { color: var(--sun); }
+  textarea.pf-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 9px 12px; color: var(--snow); font-family: 'DM Sans', sans-serif; font-size: 12px; resize: none; outline: none; min-height: 70px; line-height: 1.45; transition: border-color 0.2s; }
+  textarea.pf-input:focus { border-color: var(--teal); }
+  textarea.pf-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+
+  /* Share btn */
+  .share-btn { background: var(--teal); color: white; border: none; border-radius: 10px; padding: 11px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .share-btn:hover { background: var(--teal-lt); color: var(--bg); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="tag-row">
+    <div class="tag t1">Block 6 · Activity 6.2</div>
+    <div class="tag t2">Talk Move Rehearsal</div>
+  </div>
+  <h1>Back-Pocket Questions Practice</h1>
+  <div class="header-sub">Write WHAT → HOW → WHY level questions for a student statement, then swap and evaluate</div>
+  <div class="time-badge">⏱ 13 minutes</div>
+</div>
+
+<div class="main">
+  <!-- What-How-Why ladder -->
+  <div class="section-label">The BPQ Progression: Observable → Mechanism</div>
+  <div class="whw-ladder">
+    <div class="whw-step step-what">
+      <div class="whw-head"><span class="whw-word">WHAT</span><span class="whw-level">Observable Level</span></div>
+      <div class="whw-body">
+        Presses students to describe what they notice, observe, or measure. Stays at the surface — important to establish, but not the goal.
+        <div class="whw-example">"What do you notice about the surface temperature?" · "What happened to the puddle?"</div>
+      </div>
+    </div>
+    <div class="whw-step step-how">
+      <div class="whw-head"><span class="whw-word">HOW</span><span class="whw-level">Process Level</span></div>
+      <div class="whw-body">
+        Presses students to explain the process or relationship. Moves from pattern to cause. The transition zone.
+        <div class="whw-example">"How does that surface change what happens to the sun's energy?" · "How does the sound interfere?"</div>
+      </div>
+    </div>
+    <div class="whw-step step-why">
+      <div class="whw-head"><span class="whw-word">WHY</span><span class="whw-level">Mechanism Level</span></div>
+      <div class="whw-body">
+        Presses students to explain the underlying mechanism — why it works the way it does at a particle/system level.
+        <div class="whw-example">"Why does a darker material absorb more energy than a lighter one?" · "Why can't the orca locate prey when boats are present?"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statement picker -->
+  <div class="picker-section">
+    <div class="section-label">Choose a student statement to write BPQs for</div>
+    <div class="statement-chips">
+      <div class="stmt-chip active" onclick="selectStatement(this, 0)">
+        <div class="stmt-label">Statement A · K–2 Evaporation</div>
+        <div class="stmt-text">"I think the puddle dried up because it was hot."</div>
+      </div>
+      <div class="stmt-chip" onclick="selectStatement(this, 1)">
+        <div class="stmt-label">Statement B · Gr 3–5 Sound Pollution</div>
+        <div class="stmt-text">"The orca can't find food because of the boats."</div>
+      </div>
+      <div class="stmt-chip" onclick="selectStatement(this, 2)">
+        <div class="stmt-label">Statement C · Gr 4–6 Urban Heat Island</div>
+        <div class="stmt-text">"Our neighborhood has more concrete and it gets really hot."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BPQ Builder -->
+  <div class="bpq-builder">
+    <div class="builder-title">Write Your 3 BPQs</div>
+    <div class="builder-sub">Each question must press DEEPER than the one before. Your WHY question must require the student to explain a mechanism — not just name a word.</div>
+
+    <div class="bpq-row">
+      <div class="bpq-level-tag lvl-what">
+        <span class="lvl-word">WHAT</span>
+        <span class="lvl-desc">Observable</span>
+      </div>
+      <div>
+        <textarea class="bpq-input what" id="q-what" placeholder="What do you notice about...? What happened when...? What do you see...?" oninput="evaluateQ('what')"></textarea>
+        <div id="eval-what"></div>
+      </div>
+      <button class="eval-btn" onclick="evaluateQ('what')">Check depth</button>
+    </div>
+
+    <div class="bpq-row">
+      <div class="bpq-level-tag lvl-how">
+        <span class="lvl-word">HOW</span>
+        <span class="lvl-desc">Process</span>
+      </div>
+      <div>
+        <textarea class="bpq-input how" id="q-how" placeholder="How does... affect...? How does... change what happens to...?" oninput="evaluateQ('how')"></textarea>
+        <div id="eval-how"></div>
+      </div>
+      <button class="eval-btn" onclick="evaluateQ('how')">Check depth</button>
+    </div>
+
+    <div class="bpq-row">
+      <div class="bpq-level-tag lvl-why">
+        <span class="lvl-word">WHY</span>
+        <span class="lvl-desc">Mechanism</span>
+      </div>
+      <div>
+        <textarea class="bpq-input why" id="q-why" placeholder="Why does... happen at a particle/system level? Why does... cause...?" oninput="evaluateQ('why')"></textarea>
+        <div id="eval-why"></div>
+      </div>
+      <button class="eval-btn" onclick="evaluateQ('why')">Check depth</button>
+    </div>
+
+    <div id="example-box" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;margin-top:16px;display:none;">
+      <div style="font-size:11px;font-weight:700;color:var(--teal-lt);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Example BPQ Progression for Statement C (Urban Heat Island)</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;">
+        <strong style="color:var(--teal-lt);">WHAT:</strong> "What do you notice about the concrete that makes you say it gets hot?" <br>
+        <strong style="color:var(--sun);">HOW:</strong> "How does the concrete change what happens to the sun's energy when it lands on the surface?" <br>
+        <strong style="color:var(--terracotta);">WHY:</strong> "Why does a material that absorbs more energy end up staying hot even after the sun goes down — what's happening at the level of the particles?"
+      </div>
+    </div>
+    <button onclick="document.getElementById('example-box').style.display = document.getElementById('example-box').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 16px;color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;">💡 Show Example BPQ Progression</button>
+  </div>
+
+  <!-- Peer swap -->
+  <div class="swap-section">
+    <div class="swap-title">Peer Feedback — Swap Your WHY Question</div>
+    <div class="swap-sub">Share your WHY-level BPQ with a partner. They evaluate: Does it press for mechanism, or does it still allow a surface answer? Write their feedback below.</div>
+    <div class="peer-feedback">
+      <div class="pf-card pf-1">
+        <div class="pf-label">What my partner says about my WHY question</div>
+        <textarea class="pf-input" placeholder="Does it press for mechanism? Could a student answer it by just naming a word, or do they have to explain a process?"></textarea>
+      </div>
+      <div class="pf-card pf-2">
+        <div class="pf-label">My revised WHY question (after feedback)</div>
+        <textarea class="pf-input" placeholder="How did you strengthen it? What word or phrase makes it require genuine explanation?"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <button class="share-btn" onclick="shareWhy()">Share My WHY Question in Chat 💬</button>
+  </div>
+</div>
+
+<script>
+const STATEMENTS = [
+  { label: "A (Evaporation)", text: '"I think the puddle dried up because it was hot."' },
+  { label: "B (Sound Pollution)", text: '"The orca can\'t find food because of the boats."' },
+  { label: "C (Urban Heat)", text: '"Our neighborhood has more concrete and it gets really hot."' },
+];
+let currentStatement = 0;
+
+function selectStatement(el, idx) {
+  currentStatement = idx;
+  document.querySelectorAll('.stmt-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function evaluateQ(level) {
+  const input = document.getElementById('q-' + level).value.trim();
+  const el = document.getElementById('eval-' + level);
+  if (!input) { el.innerHTML = ''; return; }
+  const lower = input.toLowerCase();
+  let badge, msg;
+  if (level === 'what') {
+    if (lower.includes('notice') || lower.includes('observe') || lower.includes('see') || lower.includes('measure') || lower.includes('happen')) {
+      badge = 'depth-observable'; msg = '✓ Observable level — good for WHAT';
+    } else if (lower.includes('why') || lower.includes('cause') || lower.includes('mechanism')) {
+      badge = 'depth-mechanism'; msg = '↑ This might be too deep for WHAT level — consider saving it for HOW or WHY';
+    } else {
+      badge = 'depth-partial'; msg = '? Try starting with "What do you notice about..." or "What happened when..."';
+    }
+  } else if (level === 'how') {
+    if (lower.includes('how does') || lower.includes('how do') || lower.includes('what process') || lower.includes('what changes') || lower.includes('affect')) {
+      badge = 'depth-mechanism'; msg = '✓ Process level — good for HOW';
+    } else if (lower.includes('why')) {
+      badge = 'depth-mechanism'; msg = '✓ "Why" questions often reach mechanism — this may work well for HOW or WHY level';
+    } else {
+      badge = 'depth-partial'; msg = 'Try: "How does [X] affect [Y]?" or "How does that change what happens to [energy/sound/water]?"';
+    }
+  } else { // why
+    if ((lower.includes('why') || lower.includes('what causes')) && (lower.includes('particle') || lower.includes('molecule') || lower.includes('level') || lower.includes('energy transfer') || lower.includes('mechanism') || lower.includes('system'))) {
+      badge = 'depth-mechanism'; msg = '✓ Excellent — asks for mechanism at system or particle level!';
+    } else if (lower.includes('why')) {
+      badge = 'depth-partial'; msg = '↑ Getting there — can you push to the particle or system level? Add "...at the level of particles" or "...in the system"';
+    } else {
+      badge = 'depth-shallow'; msg = '⚠ Does this question require mechanism, or can a student answer with just a word?';
+    }
+  }
+  el.innerHTML = `<span class="depth-badge ${badge}">${msg}</span>`;
+}
+
+function shareWhy() {
+  const why = document.getElementById('q-why').value.trim();
+  if (!why) { alert('Write your WHY question first!'); return; }
+  const stmt = STATEMENTS[currentStatement].text;
+  const text = `My WHY-level BPQ for statement ${STATEMENTS[currentStatement].label}: "${why}" (in response to student saying: ${stmt})`;
+  navigator.clipboard.writeText(text).then(() => {
+    event.target.textContent = '✓ Copied to clipboard!';
+    event.target.style.background = 'var(--sage)';
+  });
+}
+</script>
+</body>
+</html>

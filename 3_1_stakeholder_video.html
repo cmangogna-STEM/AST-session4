@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 3.1 — Stakeholder Meeting Video Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #1a2e1e; --fern: #2d5c38; --moss: #4a8a5a; --meadow: #6db87e;
+    --earth: #3a2814; --clay: #8a4a28; --ochre: #c47a3a; --straw: #f0d498;
+    --stone: #f5f2ec; --mist: #a8b8a0; --fog: #6a7a68;
+    --deep: #101810; --white: #fff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Karla', sans-serif; background: var(--deep); color: var(--stone); min-height: 100vh; }
+
+  /* organic background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 0%, rgba(77,138,90,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(196,122,58,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .header {
+    background: var(--forest);
+    border-bottom: 2px solid rgba(109,184,126,0.2);
+    padding: 24px 36px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .header-left {}
+  .tag-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .block-tag { background: var(--fern); color: var(--meadow); font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .justice-tag { background: rgba(196,122,58,0.2); border: 1px solid rgba(196,122,58,0.4); color: var(--ochre); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .header h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--stone); margin-bottom: 4px; }
+  .header p { color: var(--mist); font-size: 13px; }
+  .time-info { text-align: right; }
+  .time-big { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--meadow); line-height: 1; }
+  .time-label { font-size: 11px; color: var(--fog); margin-top: 4px; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 32px 36px; }
+
+  /* Video section */
+  .video-section { display: grid; grid-template-columns: 340px 1fr; gap: 20px; margin-bottom: 32px; }
+
+  .video-embed {
+    background: var(--forest); border: 1px solid rgba(109,184,126,0.2); border-radius: 16px; overflow: hidden;
+  }
+  .video-thumb-area {
+    background: linear-gradient(135deg, #0d1f10, #1a3520);
+    height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    cursor: pointer; transition: background 0.3s; text-decoration: none;
+  }
+  .video-thumb-area:hover { background: linear-gradient(135deg, #1a3520, #2a4d30); }
+  .play-circle { width: 56px; height: 56px; background: rgba(109,184,126,0.2); border: 2px solid var(--meadow); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .video-thumb-area:hover .play-circle { background: rgba(109,184,126,0.35); transform: scale(1.1); }
+  .play-tri { color: var(--meadow); font-size: 22px; margin-left: 4px; }
+  .video-yt-label { color: var(--mist); font-size: 12px; font-weight: 600; }
+  .video-info-box { padding: 16px 18px; }
+  .vi-title { font-size: 13px; font-weight: 700; color: var(--stone); margin-bottom: 4px; }
+  .vi-meta { font-size: 11px; color: var(--fog); margin-bottom: 12px; }
+  .link-row { display: flex; flex-direction: column; gap: 6px; }
+  .link-pill { display: flex; align-items: center; gap: 6px; background: rgba(109,184,126,0.1); border: 1px solid rgba(109,184,126,0.25); border-radius: 8px; padding: 7px 12px; text-decoration: none; color: var(--meadow); font-size: 11px; font-weight: 600; transition: all 0.2s; }
+  .link-pill:hover { background: rgba(109,184,126,0.2); }
+
+  .pre-watch { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px 24px; }
+  .pw-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--stone); margin-bottom: 14px; }
+  .pw-5dims { display: flex; flex-direction: column; gap: 8px; }
+  .dim { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; background: rgba(109,184,126,0.06); border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+  .dim:hover { background: rgba(109,184,126,0.12); }
+  .dim.seen { background: rgba(109,184,126,0.15); border: 1px solid rgba(109,184,126,0.3); }
+  .dim-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .dim-text { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.4; }
+  .dim-text strong { color: var(--meadow); }
+  .dim-check { margin-left: auto; font-size: 14px; flex-shrink: 0; color: transparent; }
+  .dim.seen .dim-check { color: var(--meadow); }
+
+  /* 3-lens protocol */
+  .protocol-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--stone); margin-bottom: 18px; }
+  .three-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .lens-col { border-radius: 14px; overflow: hidden; }
+  .lens-header { padding: 14px 16px; text-align: center; }
+  .lens-icon { font-size: 24px; margin-bottom: 6px; }
+  .lens-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+  .lens-q { font-size: 12px; font-style: italic; margin-top: 4px; opacity: 0.8; line-height: 1.35; }
+  .lens-1 .lens-header { background: rgba(45,92,56,0.5); }
+  .lens-2 .lens-header { background: rgba(74,138,90,0.4); }
+  .lens-3 .lens-header { background: rgba(196,122,58,0.3); }
+  .lens-1 .lens-title { color: var(--meadow); }
+  .lens-2 .lens-title { color: #9ecfaa; }
+  .lens-3 .lens-title { color: var(--ochre); }
+
+  .lens-body { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-top: none; border-radius: 0 0 14px 14px; padding: 14px; }
+  .note-area {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px 12px; color: var(--stone); font-family: 'Karla', sans-serif;
+    font-size: 13px; resize: none; outline: none; min-height: 90px; line-height: 1.5;
+    transition: border-color 0.2s; margin-bottom: 8px;
+  }
+  .note-area:focus { border-color: var(--moss); }
+  .note-area::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+  .add-row-btn {
+    width: 100%; background: transparent; border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 8px; color: rgba(255,255,255,0.35); font-size: 12px;
+    font-family: 'Karla', sans-serif; cursor: pointer; transition: all 0.2s;
+  }
+  .add-row-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.55); }
+
+  /* Chat pause interaction */
+  .pause-banner {
+    background: linear-gradient(135deg, rgba(196,122,58,0.15), rgba(138,74,40,0.1));
+    border: 1px solid rgba(196,122,58,0.35); border-radius: 14px;
+    padding: 18px 22px; margin: 24px 0; display: flex; align-items: flex-start; gap: 14px;
+  }
+  .pause-icon { font-size: 28px; flex-shrink: 0; }
+  .pause-text { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.55; }
+  .pause-text strong { color: var(--ochre); }
+
+  /* Discussion questions */
+  .discussion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+  .dq { border-radius: 12px; padding: 16px 18px; }
+  .dq-1 { background: rgba(45,92,56,0.2); border: 1px solid rgba(109,184,126,0.2); }
+  .dq-2 { background: rgba(45,92,56,0.15); border: 1px solid rgba(109,184,126,0.15); }
+  .dq-3 { background: rgba(196,122,58,0.12); border: 1px solid rgba(196,122,58,0.25); }
+  .dq-4 { background: rgba(196,122,58,0.08); border: 1px solid rgba(196,122,58,0.2); }
+  .dq-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+  .dq-1 .dq-label, .dq-2 .dq-label { color: var(--meadow); }
+  .dq-3 .dq-label, .dq-4 .dq-label { color: var(--ochre); }
+  .dq-text { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.5; font-style: italic; }
+
+  .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 28px 0; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="tag-row">
+      <div class="block-tag">Block 3 · Activity 3.1</div>
+      <div class="justice-tag">⚖ Justice-Centered</div>
+    </div>
+    <h1>Edmonds Beach Cliff: Stakeholder Meeting</h1>
+    <p>Video analysis with three lenses · 2nd grade erosion unit</p>
+  </div>
+  <div class="time-info">
+    <div class="time-big">10 min</div>
+    <div class="time-label">Video + whole class discussion</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Video + 5 dims -->
+  <div class="video-section">
+    <div class="video-embed">
+      <a class="video-thumb-area" href="https://www.youtube.com/watch?v=DZnoqCAyhAQ" target="_blank">
+        <div class="play-circle"><div class="play-tri">▶</div></div>
+        <div class="video-yt-label">Watch on YouTube →</div>
+      </a>
+      <div class="video-info-box">
+        <div class="vi-title">Should We Build on the Cliff? — 2nd Grade Stakeholder Meeting</div>
+        <div class="vi-meta">~8–10 minutes · Edmonds Beach erosion unit</div>
+        <div class="link-row">
+          <a class="link-pill" href="https://www.youtube.com/watch?v=DZnoqCAyhAQ" target="_blank">🎬 YouTube Video</a>
+          <a class="link-pill" href="https://ambitiousscienceteaching.org/wp-content/uploads/2024/01/Stakeholder-Meeting.pdf" target="_blank">📄 Full Transcript (PDF)</a>
+          <a class="link-pill" href="https://ambitiousscienceteaching.org/stakeholder-meeting/" target="_blank">🔗 AST Stakeholder Meeting Page</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pre-watch">
+      <div class="pw-title">Before You Watch: 5 Justice Dimensions to Listen For</div>
+      <div class="pw-5dims">
+        <div class="dim" onclick="this.classList.toggle('seen')">
+          <div class="dim-dot" style="background:#6db87e;"></div>
+          <div class="dim-text"><strong>Nature-Culture Relations</strong> — Students speak for the cliff, ocean, animals as legitimate voices</div>
+          <div class="dim-check">✓</div>
+        </div>
+        <div class="dim" onclick="this.classList.toggle('seen')">
+          <div class="dim-dot" style="background:#9ecfaa;"></div>
+          <div class="dim-text"><strong>Families & Communities as Belonging</strong> — Community members are legitimate scientific and civic voices</div>
+          <div class="dim-check">✓</div>
+        </div>
+        <div class="dim" onclick="this.classList.toggle('seen')">
+          <div class="dim-dot" style="background:#c47a3a;"></div>
+          <div class="dim-text"><strong>Power, Historicity & Futures</strong> — Who has power to decide? What happened to this place before?</div>
+          <div class="dim-check">✓</div>
+        </div>
+        <div class="dim" onclick="this.classList.toggle('seen')">
+          <div class="dim-dot" style="background:#e8aa60;"></div>
+          <div class="dim-text"><strong>Broadening Languages of Science</strong> — Drama, gesture, role play count as scientific reasoning</div>
+          <div class="dim-check">✓</div>
+        </div>
+        <div class="dim" onclick="this.classList.toggle('seen')">
+          <div class="dim-dot" style="background:#8aafb8;"></div>
+          <div class="dim-text"><strong>Interdependence & Care</strong> — Students listen and build on each other's ideas across perspectives</div>
+          <div class="dim-check">✓</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--fog);margin-top:10px;">Click each dimension as you spot it in the video</div>
+    </div>
+  </div>
+
+  <!-- Pause banner -->
+  <div class="pause-banner">
+    <div class="pause-icon">⏸</div>
+    <div class="pause-text">
+      <strong>Facilitator — Pause the video</strong> when a student speaks for a <em>non-human stakeholder</em> (the cliff, the ocean, an animal).
+      Ask the class: "What is this student doing scientifically? What is she doing as a citizen?" Then resume.
+    </div>
+  </div>
+
+  <!-- 3-lens observation -->
+  <div class="protocol-title">Three-Lens Observation Protocol</div>
+  <div class="three-cols">
+    <div class="lens-col lens-1">
+      <div class="lens-header">
+        <div class="lens-icon">🗣</div>
+        <div class="lens-title">Talk Moves</div>
+        <div class="lens-q">What does the teacher say to move the conversation?</div>
+      </div>
+      <div class="lens-body" id="lens1-body">
+        <textarea class="note-area" placeholder="e.g. 'Teacher waited 6+ seconds before calling on anyone...'"></textarea>
+        <button class="add-row-btn" onclick="addTextarea(1)">+ Add another observation</button>
+      </div>
+    </div>
+
+    <div class="lens-col lens-2">
+      <div class="lens-header">
+        <div class="lens-icon">🧠</div>
+        <div class="lens-title">Student Thinking</div>
+        <div class="lens-q">What ideas are students expressing? How sophisticated?</div>
+      </div>
+      <div class="lens-body" id="lens2-body">
+        <textarea class="note-area" placeholder="e.g. 'Student connects cliff erosion to a decision about whose home gets protected...'"></textarea>
+        <button class="add-row-btn" onclick="addTextarea(2)">+ Add another observation</button>
+      </div>
+    </div>
+
+    <div class="lens-col lens-3">
+      <div class="lens-header">
+        <div class="lens-icon">⚖</div>
+        <div class="lens-title">Equity Practices</div>
+        <div class="lens-q">Whose voice is centered? What signals belonging?</div>
+      </div>
+      <div class="lens-body" id="lens3-body">
+        <textarea class="note-area" placeholder="e.g. 'Non-human stakeholders are given equal floor time to human ones...'"></textarea>
+        <button class="add-row-btn" onclick="addTextarea(3)">+ Add another observation</button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- Discussion Qs -->
+  <div style="font-size:11px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:14px;">Whole Class Discussion Prompts</div>
+  <div class="discussion-grid">
+    <div class="dq dq-1">
+      <div class="dq-label">Non-Human Voice</div>
+      <div class="dq-text">"A student speaks for the cliff itself. What does this do for the science learning? What does it do for the justice learning?"</div>
+    </div>
+    <div class="dq dq-2">
+      <div class="dq-label">Who's at the Table</div>
+      <div class="dq-text">"Who is at the table in this stakeholder meeting? Who is missing? If you ran this unit, how would you change the roster?"</div>
+    </div>
+    <div class="dq dq-3">
+      <div class="dq-label">2nd Grade Surprise</div>
+      <div class="dq-text">"This is 2nd grade. What surprised you about what these students were able to do? What did you assume about 7-year-olds that this video challenges?"</div>
+    </div>
+    <div class="dq dq-4">
+      <div class="dq-label">Justice Commitment</div>
+      <div class="dq-text">"How does this video show 'Fostering Interdependent Nature-Culture Relations'? Find a specific moment — not a general sense — of that commitment in action."</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function addTextarea(lensNum) {
+  const body = document.getElementById('lens' + lensNum + '-body');
+  const btn = body.querySelector('.add-row-btn');
+  const ta = document.createElement('textarea');
+  ta.className = 'note-area';
+  ta.placeholder = 'Another observation...';
+  ta.style.marginBottom = '8px';
+  body.insertBefore(ta, btn);
+  ta.focus();
+}
+</script>
+</body>
+</html>

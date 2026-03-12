@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 2.2 — Must-Have Checklist Video Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Lora:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0d1117; --surface: #161d26; --raised: #1e2936;
+    --teal: #2a8a9e; --teal-lt: #4db8cc; --gold: #e09840;
+    --rust: #c05840; --sage: #5a8f6e; --sage-lt: #8cbfa0;
+    --mist: #7a8fa0; --snow: #f0f4f8; --white: #fff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--void); color: var(--snow); min-height: 100vh; }
+
+  .top-bar {
+    background: var(--surface); border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .top-left { display: flex; align-items: center; gap: 14px; }
+  .block-tag { background: var(--teal); color: white; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .top-title { font-size: 14px; font-weight: 700; color: var(--snow); }
+  .timer-chip { background: var(--raised); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 6px 16px; font-size: 13px; font-weight: 700; color: var(--gold); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+  .timer-chip:hover { border-color: var(--gold); }
+  .timer-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  .timer-dot.running { animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(0.7);} }
+
+  .main { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 57px); }
+
+  /* Left: Video + Clips */
+  .left-panel { background: var(--surface); border-right: 1px solid rgba(255,255,255,0.07); padding: 24px 20px; overflow-y: auto; }
+  .panel-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--mist); margin-bottom: 14px; }
+
+  .video-card {
+    background: var(--raised); border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  }
+  .video-thumb {
+    background: linear-gradient(135deg, #0d2535 0%, #1a3545 100%);
+    height: 140px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .video-thumb:hover { background: linear-gradient(135deg, #1a3545 0%, #2a4a5a 100%); }
+  .play-btn {
+    width: 52px; height: 52px; background: rgba(255,255,255,0.12); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+    border: 2px solid rgba(255,255,255,0.25); transition: all 0.2s;
+  }
+  .video-thumb:hover .play-btn { background: rgba(42,138,158,0.5); border-color: var(--teal-lt); transform: scale(1.1); }
+  .play-icon { color: white; font-size: 20px; margin-left: 3px; }
+  .video-info { padding: 14px 16px; }
+  .video-title { font-size: 13px; font-weight: 700; color: var(--snow); margin-bottom: 4px; }
+  .video-meta { font-size: 11px; color: var(--mist); }
+
+  .clip-section { margin-bottom: 20px; }
+  .clip-card {
+    background: var(--raised); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .clip-card:hover, .clip-card.active { border-color: var(--teal); background: rgba(42,138,158,0.08); }
+  .clip-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .clip-title { font-size: 13px; font-weight: 700; color: var(--snow); margin-bottom: 3px; }
+  .clip-time { font-size: 11px; color: var(--teal-lt); font-weight: 600; }
+  .clip-desc { font-size: 12px; color: var(--mist); margin-top: 4px; line-height: 1.4; }
+
+  .link-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(42,138,158,0.15); border: 1px solid rgba(42,138,158,0.35);
+    border-radius: 10px; padding: 10px 14px; text-decoration: none; color: var(--teal-lt);
+    font-size: 12px; font-weight: 600; transition: all 0.2s; margin-bottom: 8px;
+  }
+  .link-btn:hover { background: rgba(42,138,158,0.25); }
+
+  /* Right: Observation protocol */
+  .right-panel { overflow-y: auto; padding: 28px 32px; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+  .tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .tab.active { border-color: var(--teal); background: rgba(42,138,158,0.15); color: var(--teal-lt); }
+  .tab-panel { display: none; animation: fadeUp 0.3s ease both; }
+  .tab-panel.active { display: block; }
+
+  /* 3-column observation */
+  .obs-header { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+  .obs-col-header { border-radius: 10px; padding: 12px 14px; text-align: center; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .obs-col-1 { background: rgba(42,138,158,0.2); color: var(--teal-lt); }
+  .obs-col-2 { background: rgba(90,143,110,0.2); color: var(--sage-lt); }
+  .obs-col-3 { background: rgba(224,152,64,0.2); color: var(--gold); }
+
+  .obs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .obs-cell { display: flex; flex-direction: column; gap: 8px; }
+  .obs-note {
+    background: var(--raised); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+    padding: 12px 14px; position: relative;
+  }
+  .obs-note textarea {
+    width: 100%; background: transparent; border: none; color: var(--snow);
+    font-family: 'Sora', sans-serif; font-size: 13px; resize: none; outline: none;
+    min-height: 70px; line-height: 1.5;
+  }
+  .obs-note textarea::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+  .add-note-btn {
+    background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 10px; text-align: center; cursor: pointer;
+    font-size: 12px; color: rgba(255,255,255,0.4); transition: all 0.2s;
+  }
+  .add-note-btn:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.6); }
+
+  /* Chat drop */
+  .chat-drop-box {
+    background: var(--raised); border: 1px solid rgba(42,138,158,0.3); border-radius: 14px;
+    padding: 20px 22px; margin-bottom: 20px;
+  }
+  .chat-prompt { font-family: 'Lora', serif; font-size: 16px; color: var(--snow); font-style: italic; margin-bottom: 12px; line-height: 1.5; }
+  .chat-input-row { display: flex; gap: 10px; }
+  .chat-input {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; padding: 10px 14px; color: var(--snow); font-family: 'Sora', sans-serif;
+    font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--teal); }
+  .chat-input::placeholder { color: rgba(255,255,255,0.25); }
+  .chat-send { background: var(--teal); color: white; border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .chat-send:hover { background: #3a9ab0; }
+
+  .chat-log { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+  .chat-bubble {
+    background: rgba(42,138,158,0.12); border-radius: 8px; padding: 9px 13px;
+    font-size: 13px; color: var(--snow); line-height: 1.4;
+    animation: fadeUp 0.3s ease both;
+  }
+  .chat-bubble span { color: var(--teal-lt); font-weight: 600; }
+
+  /* Breakout prompts */
+  .rooms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .room-card {
+    border-radius: 14px; overflow: hidden; transition: transform 0.2s;
+  }
+  .room-card:hover { transform: translateY(-3px); }
+  .room-head { padding: 12px 16px; }
+  .room-letter { font-size: 22px; font-weight: 800; }
+  .room-label { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-top: 1px; }
+  .room-body { padding: 16px; background: var(--raised); }
+  .room-question { font-family: 'Lora', serif; font-size: 14px; font-style: italic; color: var(--snow); line-height: 1.55; margin-bottom: 12px; }
+  .room-hint { font-size: 11px; line-height: 1.5; }
+  .room-a .room-head { background: rgba(42,138,158,0.3); }
+  .room-b .room-head { background: rgba(90,143,110,0.3); }
+  .room-c .room-head { background: rgba(224,152,64,0.25); }
+  .room-d .room-head { background: rgba(192,88,64,0.25); }
+  .room-a .room-hint { color: var(--teal-lt); }
+  .room-b .room-hint { color: var(--sage-lt); }
+  .room-c .room-hint { color: var(--gold); }
+  .room-d .room-hint { color: #e8906a; }
+
+  /* Justice note */
+  .justice-note {
+    background: rgba(90,143,110,0.1); border: 1px solid rgba(90,143,110,0.3);
+    border-radius: 14px; padding: 18px 22px; margin-top: 20px;
+  }
+  .justice-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--sage-lt); margin-bottom: 8px; }
+  .justice-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-left">
+    <div class="block-tag">Block 2 · Activity 2.2</div>
+    <div class="top-title">Must-Have Checklist Video Analysis</div>
+  </div>
+  <div class="timer-chip" onclick="toggleTimer(this)">
+    <div class="timer-dot" id="tdot"></div>
+    <span id="tval">15:00</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-label">Video Resource</div>
+
+    <div class="video-card">
+      <div class="video-thumb" onclick="openVideo()">
+        <div class="play-btn"><div class="play-icon">▶</div></div>
+      </div>
+      <div class="video-info">
+        <div class="video-title">Must-Have Checklist — 5th Grade Astronomy</div>
+        <div class="video-meta">AST Website · Watch before breakouts</div>
+      </div>
+    </div>
+
+    <div class="clip-section">
+      <div class="panel-label">Key Clips to Watch</div>
+      <div class="clip-card" id="clip1" onclick="selectClip(1)">
+        <div class="clip-icon">🎬</div>
+        <div>
+          <div class="clip-title">Clip 1 — Introduction</div>
+          <div class="clip-time">1:41 – 3:35</div>
+          <div class="clip-desc">Teacher introduces the checklist — watch for how students respond</div>
+        </div>
+      </div>
+      <div class="clip-card" id="clip2" onclick="selectClip(2)">
+        <div class="clip-icon">🎬</div>
+        <div>
+          <div class="clip-title">Clip 2 — Creating the Checklist</div>
+          <div class="clip-time">4:53 – 9:51</div>
+          <div class="clip-desc">Co-construction in action — whose words end up on the chart?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-label">Links</div>
+    <a class="link-btn" href="https://ambitiousscienceteaching.org" target="_blank">🔗 AST Website — Must-Have Checklist</a>
+    <a class="link-btn" href="https://ambitiousscienceteaching.org/co-constructing-summary-tables/" target="_blank">🔗 Co-Constructing Summary Tables</a>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('observe',this)">📋 Observation Protocol</div>
+      <div class="tab" onclick="switchTab('chatdrop',this)">💬 Chat Drop</div>
+      <div class="tab" onclick="switchTab('breakout',this)">👥 Breakout Prompts</div>
+    </div>
+
+    <!-- OBSERVATION PROTOCOL -->
+    <div class="tab-panel active" id="tab-observe">
+      <div class="obs-header">
+        <div class="obs-col-header obs-col-1">Lens 1: Student Ideas<br><span style="font-size:10px;opacity:0.7;font-weight:400">What ideas do you hear?</span></div>
+        <div class="obs-col-header obs-col-2">Lens 2: Teacher Moves<br><span style="font-size:10px;opacity:0.7;font-weight:400">What does the teacher do?</span></div>
+        <div class="obs-col-header obs-col-3">Lens 3: The Checklist<br><span style="font-size:10px;opacity:0.7;font-weight:400">How does it scaffold assessment?</span></div>
+      </div>
+      <div class="obs-grid">
+        <div class="obs-cell" id="col1"></div>
+        <div class="obs-cell" id="col2"></div>
+        <div class="obs-cell" id="col3"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button onclick="addNote(1)" style="flex:1;background:rgba(42,138,158,0.15);border:1px dashed rgba(42,138,158,0.4);border-radius:8px;padding:9px;color:var(--teal-lt);font-size:12px;font-weight:600;cursor:pointer;">+ Student idea</button>
+        <button onclick="addNote(2)" style="flex:1;background:rgba(90,143,110,0.15);border:1px dashed rgba(90,143,110,0.4);border-radius:8px;padding:9px;color:var(--sage-lt);font-size:12px;font-weight:600;cursor:pointer;">+ Teacher move</button>
+        <button onclick="addNote(3)" style="flex:1;background:rgba(224,152,64,0.15);border:1px dashed rgba(224,152,64,0.4);border-radius:8px;padding:9px;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;">+ Checklist note</button>
+      </div>
+    </div>
+
+    <!-- CHAT DROP -->
+    <div class="tab-panel" id="tab-chatdrop">
+      <div class="chat-drop-box">
+        <div class="chat-prompt">"Drop one specific teacher talk move you observed into the chat — quote it if you can."</div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="e.g. 'What did you notice about...' or 'Can someone add to that?'" maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">Post 💬</button>
+        </div>
+        <div class="chat-log" id="chat-log"></div>
+      </div>
+
+      <div style="background:var(--raised);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:11px;font-weight:700;color:var(--mist);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">AST Talk Move Reference</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(42,138,158,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--snow);"><strong style="color:var(--teal-lt);">Re-voicing:</strong> "So what I hear you saying is..."</div>
+          <div style="background:rgba(42,138,158,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--snow);"><strong style="color:var(--teal-lt);">Opening the floor:</strong> "Who can add to what [student] said?"</div>
+          <div style="background:rgba(42,138,158,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--snow);"><strong style="color:var(--teal-lt);">Pressing for mechanism:</strong> "Why do you think that happens?"</div>
+          <div style="background:rgba(42,138,158,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--snow);"><strong style="color:var(--teal-lt);">Wait time:</strong> [7+ seconds of silence — counts as a move!]</div>
+          <div style="background:rgba(42,138,158,0.1);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--snow);"><strong style="color:var(--teal-lt);">Harvesting disagreement:</strong> "I notice two different ideas here — both are interesting..."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BREAKOUT PROMPTS -->
+    <div class="tab-panel" id="tab-breakout">
+      <div style="background:rgba(224,152,64,0.1);border:1px solid rgba(224,152,64,0.25);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55;">
+        <strong style="color:var(--gold);">Facilitator:</strong> Assign each room ONE question. They go deep on theirs for 7 minutes, then share back 2–3 key findings in 60 seconds each.
+      </div>
+
+      <div class="rooms-grid">
+        <div class="room-card room-a">
+          <div class="room-head">
+            <div class="room-letter">Room A</div>
+            <div class="room-label">Teacher Moves</div>
+          </div>
+          <div class="room-body">
+            <div class="room-question">"What does the teacher do when a student says something unexpected or off-topic?"</div>
+            <div class="room-hint">Look for: Does the teacher redirect immediately? Pause? Build on it? What does that communicate to students?</div>
+          </div>
+        </div>
+
+        <div class="room-card room-b">
+          <div class="room-head">
+            <div class="room-letter">Room B</div>
+            <div class="room-label">Whose Words?</div>
+          </div>
+          <div class="room-body">
+            <div class="room-question">"How does the teacher use student language in building the checklist — whose words end up on the chart?"</div>
+            <div class="room-hint">Look for: Does the teacher paraphrase? Keep exact student wording? Who speaks most? Whose ideas get taken up?</div>
+          </div>
+        </div>
+
+        <div class="room-card room-c">
+          <div class="room-head">
+            <div class="room-letter">Room C</div>
+            <div class="room-label">Developmental</div>
+          </div>
+          <div class="room-body">
+            <div class="room-question">"What would this look like for K–2? What would you keep? What would you change?"</div>
+            <div class="room-hint">Consider: Max 4–5 items, visual supports, oral co-creation, drawing as evidence. Where does the complexity need to shift?</div>
+          </div>
+        </div>
+
+        <div class="room-card room-d">
+          <div class="room-head">
+            <div class="room-letter">Room D</div>
+            <div class="room-label">Justice Lens</div>
+          </div>
+          <div class="room-body">
+            <div class="room-question">"How is this checklist connected to justice? Whose knowledge counts as 'what we learned'?"</div>
+            <div class="room-hint">Consider: Whose ideas made the checklist? What languages are represented? What counts as scientific evidence here?</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="justice-note">
+        <div class="justice-label">Justice-Centered Element</div>
+        <div class="justice-text">Room D's question is the most politically courageous — and the most important. The checklist is a public record of what counts as knowledge in this classroom. That is never neutral. Facilitator: name this explicitly when Room D shares back.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let timerSec = 15 * 60, timerRunning = false, timerInterval = null;
+const notes = { 1: [], 2: [], 3: [] };
+const chatMessages = [];
+const names = ['Marcus','Priya','Dana','Leila','Sam','Theo','Keiko','Rivera'];
+
+function toggleTimer(el) {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('tdot').classList.remove('running');
+  } else {
+    timerRunning = true;
+    document.getElementById('tdot').classList.add('running');
+    timerInterval = setInterval(() => {
+      timerSec--;
+      const m = Math.floor(timerSec / 60);
+      const s = timerSec % 60;
+      document.getElementById('tval').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (timerSec <= 0) { clearInterval(timerInterval); timerRunning = false; document.getElementById('tval').textContent = '0:00'; document.getElementById('tdot').style.background = 'var(--rust)'; }
+    }, 1000);
+  }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab,.tab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+const placeholders = [
+  ['I noticed the orca uses sound to find fish...', 'What could be getting in the way of that?', 'Students explain sound travels differently in water'],
+  ['Teacher waited 8+ seconds — no one responded, then 3 hands went up', 'Re-voiced: "So you\'re saying the boat noise competes..."', 'Wrote student\'s exact phrase on the chart'],
+  ['Item #1 came from what students measured in their investigation', 'Checklist has a visual diagram column for multilingual learners', 'Students can check off with drawing OR writing']
+];
+
+function addNote(col) {
+  const id = Date.now();
+  notes[col].push({ id, text: '' });
+  renderCol(col);
+  setTimeout(() => {
+    const ta = document.querySelector(`#col${col} textarea:last-of-type`);
+    if (ta) ta.focus();
+  }, 50);
+}
+
+function renderCol(col) {
+  const el = document.getElementById('col' + col);
+  el.innerHTML = notes[col].map((n, i) => `
+    <div class="obs-note">
+      <textarea placeholder="${placeholders[col-1][i % 3] || 'Note...'}" oninput="notes[${col}][${i}].text=this.value">${n.text}</textarea>
+    </div>
+  `).join('');
+  if (!notes[col].length) el.innerHTML = `<div class="add-note-btn" onclick="addNote(${col})">+ Add observation</div>`;
+}
+
+function openVideo() {
+  window.open('https://ambitiousscienceteaching.org', '_blank');
+}
+
+function selectClip(n) {
+  document.querySelectorAll('.clip-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('clip'+n).classList.add('active');
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const name = names[chatMessages.length % names.length];
+  chatMessages.push({ name, text });
+  const log = document.getElementById('chat-log');
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = `<span>${name}:</span> ${text}`;
+  log.appendChild(bubble);
+  log.scrollTop = log.scrollHeight;
+  input.value = '';
+}
+
+// Init columns with one slot each
+[1,2,3].forEach(c => { notes[c].push({id:Date.now()+c,text:''}); renderCol(c); });
+</script>
+</body>
+</html>

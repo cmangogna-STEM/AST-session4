@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 3.2 — Micro-Stakeholder Meeting Role Play</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1a14; --surface: #172110; --card: #1e2d18; --border: rgba(109,184,126,0.2);
+    --green: #2d7a3a; --meadow: #6db87e; --sage-lt: #a8d4b0; --gold: #d4903a;
+    --amber: #e8b060; --rust: #b85040; --terracotta: #d46848;
+    --slate: #0e1e28; --teal: #3a9aaa; --ocean: #5abccc;
+    --mist: #8aaa90; --fog: #586858; --white: #f8f4ec;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Karla', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+
+  .header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 22px 36px; display: flex; align-items: center; justify-content: space-between; }
+  .tag-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .tag { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; }
+  .tag-green { background: var(--green); color: var(--meadow); }
+  .tag-gold { background: rgba(212,144,58,0.2); border: 1px solid rgba(212,144,58,0.4); color: var(--amber); }
+  h1 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); margin-bottom: 3px; }
+  .header-sub { color: var(--mist); font-size: 13px; }
+  .timer-big { font-family: 'DM Serif Display', serif; font-size: 40px; color: var(--meadow); line-height: 1; text-align: right; }
+  .timer-label { font-size: 11px; color: var(--fog); text-align: right; margin-top: 2px; }
+  .timer-controls { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+  .tc-btn { background: rgba(109,184,126,0.15); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; color: var(--meadow); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .tc-btn:hover { background: rgba(109,184,126,0.25); }
+
+  .layout { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 90px); }
+  .pane { padding: 28px 32px; overflow-y: auto; }
+  .pane-left { border-right: 1px solid rgba(255,255,255,0.07); }
+
+  /* Phenomenon selector */
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--fog); margin-bottom: 14px; }
+  .phenom-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .phenom-card {
+    background: var(--card); border: 2px solid transparent; border-radius: 14px;
+    padding: 16px 18px; cursor: pointer; transition: all 0.2s;
+  }
+  .phenom-card:hover { border-color: rgba(109,184,126,0.35); }
+  .phenom-card.active { border-color: var(--meadow); background: rgba(45,122,58,0.12); }
+  .phenom-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .phenom-grade { font-size: 11px; color: var(--mist); font-weight: 600; }
+  .phenom-science { font-size: 12px; color: var(--sage-lt); margin-top: 4px; }
+
+  /* Character cards */
+  .characters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .char-card {
+    border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .char-card:hover { transform: translateY(-2px); }
+  .char-card.selected { border-color: var(--amber); }
+  .char-head { padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .char-emoji { font-size: 24px; }
+  .char-name { font-size: 13px; font-weight: 700; }
+  .char-role { font-size: 11px; opacity: 0.7; }
+  .char-body { padding: 10px 12px; font-size: 12px; line-height: 1.5; }
+  .char-perspective { font-style: italic; color: rgba(255,255,255,0.75); }
+  .char-stake { font-size: 11px; margin-top: 6px; font-weight: 600; }
+
+  /* Phenomenon color schemes */
+  .phenom-0 .char-head { background: rgba(45,122,58,0.4); }
+  .phenom-0 .char-body { background: rgba(45,122,58,0.12); }
+  .phenom-0 .char-stake { color: var(--meadow); }
+  .phenom-1 .char-head { background: rgba(58,154,170,0.35); }
+  .phenom-1 .char-body { background: rgba(58,154,170,0.1); }
+  .phenom-1 .char-stake { color: var(--ocean); }
+  .phenom-2 .char-head { background: rgba(212,144,58,0.3); }
+  .phenom-2 .char-body { background: rgba(212,144,58,0.08); }
+  .phenom-2 .char-stake { color: var(--amber); }
+
+  /* Right pane - facilitation guide */
+  .teacher-role-box {
+    background: rgba(184,80,64,0.1); border: 1px solid rgba(184,80,64,0.35);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 20px;
+  }
+  .teacher-role-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--terracotta); margin-bottom: 8px; }
+  .teacher-role-text { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.6; }
+
+  .talk-moves { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .move-card {
+    background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+    padding: 12px 14px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .move-card:hover, .move-card.used { background: rgba(109,184,126,0.1); border-color: var(--border); }
+  .move-card.used { opacity: 0.5; }
+  .move-check { width: 20px; height: 20px; border: 2px solid rgba(109,184,126,0.4); border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .move-card.used .move-check { background: var(--green); border-color: var(--green); color: white; font-size: 12px; }
+  .move-text { font-size: 13px; color: var(--white); }
+  .move-example { font-size: 12px; color: var(--mist); font-style: italic; margin-top: 3px; }
+
+  .goal-tracker { background: var(--card); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
+  .goal-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--fog); margin-bottom: 12px; }
+  .goal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .goal-toggle { width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.2); border-radius: 6px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .goal-toggle.done { background: var(--meadow); border-color: var(--meadow); color: white; font-size: 12px; }
+  .goal-text { font-size: 13px; color: rgba(255,255,255,0.8); }
+
+  .debrief-prompts { display: flex; flex-direction: column; gap: 10px; }
+  .dp { background: rgba(255,255,255,0.04); border-left: 3px solid; border-radius: 0 10px 10px 0; padding: 12px 16px; }
+  .dp-teacher { border-color: var(--terracotta); }
+  .dp-class { border-color: var(--meadow); }
+  .dp-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+  .dp-teacher .dp-label { color: var(--terracotta); }
+  .dp-class .dp-label { color: var(--meadow); }
+  .dp-text { font-size: 13px; color: rgba(255,255,255,0.8); font-style: italic; line-height: 1.5; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab { padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--green); border-color: var(--green); color: var(--white); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="tag-row">
+      <div class="tag tag-green">Block 3 · Activity 3.2</div>
+      <div class="tag tag-gold">Role Play & Rehearsal</div>
+    </div>
+    <h1>Micro-Stakeholder Meeting</h1>
+    <div class="header-sub">8-minute breakout rooms · teacher role cannot give the answer</div>
+  </div>
+  <div>
+    <div class="timer-big" id="timer-display">8:00</div>
+    <div class="timer-label">Breakout room timer</div>
+    <div class="timer-controls">
+      <button class="tc-btn" onclick="toggleTimer()">▶ Start</button>
+      <button class="tc-btn" onclick="resetTimer()">↺</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: Phenomenon + Characters -->
+  <div class="pane pane-left">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('phenomenon',this)">🌍 Phenomena</div>
+      <div class="tab" onclick="switchTab('characters',this)">🎭 Character Cards</div>
+    </div>
+
+    <!-- Phenomena -->
+    <div class="tab-panel active" id="tab-phenomenon">
+      <div class="section-label">Choose Your Group's Phenomenon</div>
+      <div class="phenom-cards">
+        <div class="phenom-card active" onclick="selectPhenom(0,this)">
+          <div class="phenom-title">🌿 The Wetlands Highway</div>
+          <div class="phenom-grade">Grades 3–5 · Ecosystems</div>
+          <div class="phenom-science">Should we build a new highway through the wetlands near our school?</div>
+        </div>
+        <div class="phenom-card" onclick="selectPhenom(1,this)">
+          <div class="phenom-title">🌳 The Old Oak Tree</div>
+          <div class="phenom-grade">Grades K–3 · Living Systems</div>
+          <div class="phenom-science">Should the school cut down the old oak tree to build a new parking lot?</div>
+        </div>
+        <div class="phenom-card" onclick="selectPhenom(2,this)">
+          <div class="phenom-title">🌱 The Empty Lot</div>
+          <div class="phenom-grade">Grades 2–5 · Urban Ecology</div>
+          <div class="phenom-science">Should the community plant a garden or build a parking lot on the empty lot next to school?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Characters -->
+    <div class="tab-panel" id="tab-characters">
+      <div class="section-label">Select Your Character — Click to Read Your Role</div>
+      <div class="characters-grid" id="char-grid"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Facilitation guide -->
+  <div class="pane">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTabR('teachrole',this)">🎓 Teacher Role</div>
+      <div class="tab" onclick="switchTabR('talkmoves',this)">💬 Talk Moves</div>
+      <div class="tab" onclick="switchTabR('debrief',this)">🗣 Debrief</div>
+    </div>
+
+    <!-- Teacher role -->
+    <div class="tab-panel active" id="tabr-teachrole">
+      <div class="teacher-role-box">
+        <div class="teacher-role-label">The Teacher-Facilitator's ONE Rule</div>
+        <div class="teacher-role-text">
+          <strong style="color:var(--terracotta);">You cannot give the scientific answer.</strong><br><br>
+          Your job is to press stakeholders to explain their reasoning, connect ideas to evidence, and surface disagreements — without resolving them. If you feel the urge to tell them the answer, use a talk move instead.
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-bottom:12px;">Your Goal: Use at Least 3 of These</div>
+      <div class="goal-tracker">
+        <div class="goal-label">Facilitation Checklist</div>
+        <div class="goal-row"><div class="goal-toggle" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';">  </div><div class="goal-text">Asked at least 2 stakeholders to share their perspective</div></div>
+        <div class="goal-row"><div class="goal-toggle" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';">  </div><div class="goal-text">Re-voiced a student idea without correcting it</div></div>
+        <div class="goal-row"><div class="goal-toggle" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';">  </div><div class="goal-text">Pressed for "why" or "how" (not just "what")</div></div>
+        <div class="goal-row"><div class="goal-toggle" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';">  </div><div class="goal-text">Invited a quieter stakeholder into the conversation</div></div>
+        <div class="goal-row"><div class="goal-toggle" onclick="this.classList.toggle('done');this.textContent=this.classList.contains('done')?'✓':'';">  </div><div class="goal-text">Named a disagreement productively (not resolved it)</div></div>
+      </div>
+    </div>
+
+    <!-- Talk moves -->
+    <div class="tab-panel" id="tabr-talkmoves">
+      <div class="section-label">Press Without Telling — Your Talk Move Toolkit</div>
+      <div class="talk-moves">
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Re-voice</strong> — repeat back with a slight reframe</div>
+            <div class="move-example">"So what I hear [frog/developer/student] saying is... Is that right?"</div>
+          </div>
+        </div>
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Press for mechanism</strong></div>
+            <div class="move-example">"Why does that happen? What's the scientific process that causes that?"</div>
+          </div>
+        </div>
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Open the floor</strong></div>
+            <div class="move-example">"Does another stakeholder see it differently? What evidence do they have?"</div>
+          </div>
+        </div>
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Harvest disagreement</strong></div>
+            <div class="move-example">"I notice the tree and the developer have different ideas. Let's stay with that tension..."</div>
+          </div>
+        </div>
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Ask for evidence</strong></div>
+            <div class="move-example">"What data or observations support that? Where does your knowledge come from?"</div>
+          </div>
+        </div>
+        <div class="move-card" onclick="this.classList.toggle('used')">
+          <div class="move-check"></div>
+          <div>
+            <div class="move-text"><strong>Wait time</strong> (7+ seconds of silence)</div>
+            <div class="move-example">[Just count silently. Don't fill the space. This IS a move.]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debrief -->
+    <div class="tab-panel" id="tabr-debrief">
+      <div class="section-label">After Returning to Main Room</div>
+      <div class="debrief-prompts">
+        <div class="dp dp-teacher">
+          <div class="dp-label">Teacher-Facilitator Reflects First</div>
+          <div class="dp-text">"Share one talk move you tried — and one moment where you wanted to just tell them the answer. What stopped you? What made it hard?"</div>
+        </div>
+        <div class="dp dp-class">
+          <div class="dp-label">Then the Class</div>
+          <div class="dp-text">"When did the science and the justice feel like they were in tension? What happened in that moment?"</div>
+        </div>
+        <div class="dp dp-class">
+          <div class="dp-label">Whole Class</div>
+          <div class="dp-text">"What would students need to know BEFORE this meeting? What would come AFTER it to deepen the science explanation?"</div>
+        </div>
+        <div class="dp dp-teacher">
+          <div class="dp-label">Justice Lens</div>
+          <div class="dp-text">"In your meeting, who had the most power? Was that the same as who had the most scientific knowledge? Why does that distinction matter?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PHENOMENA = [
+  {
+    name: "The Wetlands Highway",
+    chars: [
+      { emoji: "🏗", name: "Developer", role: "Construction company rep", perspective: "The highway will bring jobs and reduce commute times for workers who can't afford to live near the city. Economic growth benefits everyone.", stake: "Stake: Economic opportunity vs. ecosystem harm", colors: 'phenom-0' },
+      { emoji: "🐸", name: "Wetland Frog", role: "Non-human stakeholder", perspective: "My entire life cycle depends on this wetland — breeding, hunting, shelter. My population has already declined 60% in this area.", stake: "Stake: Survival of species, biodiversity", colors: 'phenom-0' },
+      { emoji: "🧓", name: "Indigenous Elder", role: "Community knowledge holder", perspective: "My family has gathered food, medicine, and meaning from this wetland for generations. We have detailed knowledge of how this ecosystem changes across seasons.", stake: "Stake: Cultural memory, Traditional Ecological Knowledge", colors: 'phenom-0' },
+      { emoji: "🏙", name: "City Planner", role: "Government official", perspective: "Traffic models show real need. But engineering studies suggest a raised highway could preserve 70% of the wetland. There are tradeoffs to consider.", stake: "Stake: Infrastructure policy, balanced decision-making", colors: 'phenom-0' },
+      { emoji: "👧", name: "Elementary Student", role: "Student from nearby school", perspective: "We did an investigation and found that wetlands filter pollution from our drinking water. If this wetland disappears, what happens to the water?", stake: "Stake: Health, science-informed civic voice", colors: 'phenom-0' },
+    ]
+  },
+  {
+    name: "The Old Oak Tree",
+    chars: [
+      { emoji: "🌳", name: "The Oak Tree", role: "Non-human stakeholder (260 years old)", perspective: "My roots extend across the entire parking area. Removing me would change the soil, temperature, and water flow of this land for decades. I have stored 14 tons of carbon.", stake: "Stake: Carbon storage, habitat, living memory", colors: 'phenom-1' },
+      { emoji: "🐦", name: "Nesting Bird", role: "Red-tailed hawk", perspective: "I have nested in this tree for 9 years. My nest is 47 feet up. There is no comparable nesting site within a mile. My chicks cannot yet fly.", stake: "Stake: Immediate survival, habitat loss", colors: 'phenom-1' },
+      { emoji: "👩‍👧", name: "Parent", role: "Parent of school student", perspective: "I strongly support the new parking lot. I spend 15 minutes every day trying to park. It's dangerous. Other trees exist.", stake: "Stake: Safety, daily experience", colors: 'phenom-1' },
+      { emoji: "🧹", name: "School Janitor", role: "Staff member and long-time employee", perspective: "I've worked here 22 years. That tree shades the building and saves us $4,000 in cooling costs every summer. Students play under it every day.", stake: "Stake: Institutional memory, practical knowledge", colors: 'phenom-1' },
+      { emoji: "🧒", name: "3rd Grader", role: "Student", perspective: "We measured the temperature under the tree and in the sun last week. Under the tree it was 12 degrees cooler. My class thinks the shade matters.", stake: "Stake: Science evidence from investigation", colors: 'phenom-1' },
+    ]
+  },
+  {
+    name: "The Empty Lot",
+    chars: [
+      { emoji: "👴", name: "Senior Resident", role: "Community member (35 years in neighborhood)", perspective: "My grandchildren visit me here. A garden would give us a place to grow food together. I grew up gardening with my family in Puerto Rico. That practice matters here too.", stake: "Stake: Cultural continuity, intergenerational connection", colors: 'phenom-2' },
+      { emoji: "🐝", name: "Honeybee", role: "Non-human stakeholder", perspective: "The flowering plants 3 blocks away are disappearing. This lot is the last possible habitat corridor. Without it, the hive cannot survive this summer.", stake: "Stake: Pollinator survival, food system health", colors: 'phenom-2' },
+      { emoji: "🧱", name: "Small Business Owner", role: "Shop owner 2 blocks away", perspective: "My customers circle for parking for 20 minutes. A parking lot would increase foot traffic to the whole neighborhood. That means more jobs.", stake: "Stake: Economic stability, neighborhood vitality", colors: 'phenom-2' },
+      { emoji: "🌎", name: "The Soil", role: "Non-human stakeholder", perspective: "I have been compacted and polluted for 40 years. A garden would take years of healing to restore my microbial life. Concrete would make me inaccessible forever.", stake: "Stake: Long-term ecosystem function, remediation", colors: 'phenom-2' },
+      { emoji: "👦", name: "Teenager", role: "Youth community organizer", perspective: "We surveyed 80 families on this block. 73% want a garden with a youth growing program. We have a plan ready. We just need the city to say yes.", stake: "Stake: Youth agency, democratic participation", colors: 'phenom-2' },
+    ]
+  }
+];
+
+let currentPhenom = 0;
+let timerSec = 8 * 60, timerRunning = false, timerInterval = null;
+
+function selectPhenom(idx, el) {
+  currentPhenom = idx;
+  document.querySelectorAll('.phenom-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderChars();
+}
+
+function renderChars() {
+  const chars = PHENOMENA[currentPhenom].chars;
+  const grid = document.getElementById('char-grid');
+  grid.innerHTML = chars.map(c => `
+    <div class="char-card ${c.colors}" onclick="this.classList.toggle('selected')">
+      <div class="char-head">
+        <div class="char-emoji">${c.emoji}</div>
+        <div>
+          <div class="char-name">${c.name}</div>
+          <div class="char-role">${c.role}</div>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="char-perspective">"${c.perspective}"</div>
+        <div class="char-stake">${c.stake}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchTab(name, el) {
+  const panel = el.closest('.pane');
+  panel.querySelectorAll('.tab,.tab-panel').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+function switchTabR(name, el) {
+  document.querySelectorAll('#tabr-teachrole,#tabr-talkmoves,#tabr-debrief').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tabr-'+name).classList.add('active');
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+  } else {
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timerSec--;
+      const m = Math.floor(timerSec/60);
+      const s = timerSec % 60;
+      document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+      if (timerSec <= 0) { clearInterval(timerInterval); timerRunning = false; document.getElementById('timer-display').style.color = 'var(--terracotta)'; }
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSec = 8*60;
+  document.getElementById('timer-display').textContent = '8:00';
+  document.getElementById('timer-display').style.color = '';
+}
+
+renderChars();
+</script>
+</body>
+</html>
