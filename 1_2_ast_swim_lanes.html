@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity 1.2 — AST Swim Lane Sort</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep:#1B3A4B;--teal:#2E6B7A;--sage:#5E8A6E;--gold:#D4894A;--rust:#B25C3A;
+    --cream:#FBF8F2;--lt-teal:#E8F2F5;--white:#fff;--dark:#1A2830;--muted:#7a8a90;
+    --lt-sage:#A8C5B0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
+
+  .header{background:var(--deep);padding:28px 32px 20px;border-bottom:3px solid var(--teal);}
+  .block-tag{display:inline-block;background:var(--teal);color:var(--white);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:10px;}
+  .header h1{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--white);margin-bottom:4px;}
+  .header p{color:var(--lt-sage);font-size:14px;}
+  .time-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(168,197,176,0.2);border:1px solid rgba(168,197,176,0.4);color:var(--lt-sage);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:8px;}
+
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:0;min-height:calc(100vh - 120px);}
+
+  /* Cards bank */
+  .bank{background:var(--deep);padding:20px 16px;overflow-y:auto;}
+  .bank-title{font-size:11px;font-weight:700;color:var(--lt-sage);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .legend{margin-bottom:14px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:5px;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+  .card{padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:grab;margin-bottom:8px;user-select:none;transition:transform 0.15s,box-shadow 0.15s;border:2px solid transparent;line-height:1.35;}
+  .card:active{cursor:grabbing;}
+  .card.dragging{opacity:0.5;transform:scale(0.95);}
+  .card.tool{background:#1e4a5c;border-color:#2E6B7A;color:#a8d4dc;}
+  .card.move{background:#2d4a38;border-color:#5E8A6E;color:#a8c5b0;}
+  .card.lesson{background:#4a2d1a;border-color:#D4894A;color:#f5c49a;}
+
+  /* Lanes */
+  .lanes{padding:20px;overflow-x:auto;}
+  .lanes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;min-width:700px;}
+  .lane{border-radius:14px;overflow:hidden;min-height:480px;display:flex;flex-direction:column;}
+  .lane-header{padding:14px 16px 12px;text-align:center;}
+  .lane-num{font-family:'Fraunces',serif;font-size:28px;font-weight:900;line-height:1;}
+  .lane-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+  .lane-sub{font-size:10px;opacity:0.7;margin-top:2px;}
+  .lane-body{flex:1;padding:12px;border-radius:0 0 14px 14px;min-height:300px;transition:background 0.2s;}
+  .lane-body.drag-over{background:rgba(255,255,255,0.12)!important;}
+
+  .lane-1 .lane-header{background:#1B3A4B;color:#a8c5b0;}
+  .lane-1 .lane-body{background:#1a2e3a;}
+  .lane-2 .lane-header{background:#1e4a5c;color:#7ecfd8;}
+  .lane-2 .lane-body{background:#1a3545;}
+  .lane-3 .lane-header{background:#2E6B7A;color:#e0f4f7;}
+  .lane-3 .lane-body{background:#243f4a;}
+  .lane-4 .lane-header{background:#B25C3A;color:#f9d4c4;}
+  .lane-4 .lane-body{background:#3a2218;}
+
+  .lane-card{padding:9px 11px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:7px;cursor:grab;user-select:none;line-height:1.35;transition:opacity 0.15s;}
+  .lane-card:active{cursor:grabbing;}
+  .lane-card.tool{background:rgba(46,107,122,0.5);border:1px solid rgba(46,107,122,0.7);color:#a8d4dc;}
+  .lane-card.move{background:rgba(94,138,110,0.5);border:1px solid rgba(94,138,110,0.7);color:#a8c5b0;}
+  .lane-card.lesson{background:rgba(212,137,74,0.4);border:1px solid rgba(212,137,74,0.6);color:#f5c49a;}
+
+  .empty-hint{font-size:11px;color:rgba(255,255,255,0.25);text-align:center;padding:20px 8px;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;line-height:1.4;}
+
+  /* Bottom bar */
+  .bottom-bar{background:var(--deep);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);}
+  .progress{font-size:13px;color:var(--lt-sage);}
+  .progress strong{color:var(--gold);}
+  .btn-row{display:flex;gap:10px;}
+  .btn{padding:9px 20px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+  .btn-check{background:var(--sage);color:var(--white);}
+  .btn-check:hover{background:#4a7357;}
+  .btn-reset{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);}
+  .btn-reset:hover{background:rgba(255,255,255,0.14);}
+
+  .feedback-banner{padding:10px 20px;font-size:13px;font-weight:600;display:none;border-top:1px solid rgba(255,255,255,0.08);}
+  .feedback-banner.correct{background:rgba(94,138,110,0.2);color:var(--lt-sage);}
+  .feedback-banner.partial{background:rgba(212,137,74,0.2);color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="block-tag">Block 1 · Activity 1.2</div>
+  <h1>AST Cycle Visual Reconstruction</h1>
+  <p>Drag each card into the correct AST stage lane</p>
+  <div class="time-badge">⏱ 12 minutes &nbsp;·&nbsp; Collaborative Whiteboard / Miro</div>
+</div>
+
+<div class="layout">
+  <!-- BANK -->
+  <div class="bank">
+    <div class="bank-title">Sort These Cards</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#2E6B7A"></div> Blue = Tools</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5E8A6E"></div> Green = Teacher Moves</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D4894A"></div> Orange = Lesson Types</div>
+    </div>
+    <div id="bank-cards"></div>
+  </div>
+
+  <!-- LANES -->
+  <div>
+    <div class="lanes">
+      <div class="lanes-grid">
+        <div class="lane lane-1">
+          <div class="lane-header"><div class="lane-num">①</div><div class="lane-title">Planning</div><div class="lane-sub">for Engagement</div></div>
+          <div class="lane-body" id="lane-1" ondragover="allowDrop(event)" ondrop="dropCard(event,'1')">
+            <div class="empty-hint">Drag cards here</div>
+          </div>
+        </div>
+        <div class="lane lane-2">
+          <div class="lane-header"><div class="lane-num">②</div><div class="lane-title">Eliciting</div><div class="lane-sub">Student Ideas</div></div>
+          <div class="lane-body" id="lane-2" ondragover="allowDrop(event)" ondrop="dropCard(event,'2')">
+            <div class="empty-hint">Drag cards here</div>
+          </div>
+        </div>
+        <div class="lane lane-3">
+          <div class="lane-header"><div class="lane-num">③</div><div class="lane-title">Supporting</div><div class="lane-sub">Ongoing Thinking</div></div>
+          <div class="lane-body" id="lane-3" ondragover="allowDrop(event)" ondrop="dropCard(event,'3')">
+            <div class="empty-hint">Drag cards here</div>
+          </div>
+        </div>
+        <div class="lane lane-4">
+          <div class="lane-header"><div class="lane-num">④</div><div class="lane-title">Pressing for</div><div class="lane-sub">Explanation</div></div>
+          <div class="lane-body" id="lane-4" ondragover="allowDrop(event)" ondrop="dropCard(event,'4')">
+            <div class="empty-hint">Drag cards here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="progress">Placed: <strong id="placed-count">0</strong> / 16 cards</div>
+      <div class="btn-row">
+        <button class="btn btn-reset" onclick="resetAll()">↺ Reset</button>
+        <button class="btn btn-check" onclick="checkAnswers()">Check My Sort ✓</button>
+      </div>
+    </div>
+    <div class="feedback-banner" id="feedback-banner"></div>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  // Tools (blue)
+  {id:'c1', text:'What-How-Why Framework', type:'tool', lane:'2', note:'Used to elicit initial ideas about a phenomenon'},
+  {id:'c2', text:'Model Template', type:'tool', lane:'2', note:'Students draw initial models during elicitation'},
+  {id:'c3', text:'Summary Table / KLEWS', type:'tool', lane:'3', note:'Public record that tracks evolving class thinking'},
+  {id:'c4', text:'Back-Pocket Questions (BPQs)', type:'tool', lane:'3', note:'Pre-planned questions to move from observable to unobservable — also used in Stage 4'},
+  {id:'c5', text:'Must-Have Checklist', type:'tool', lane:'4', note:'Scaffold for students to build complete explanations'},
+  {id:'c6', text:'Phenomenon Selection Tool', type:'tool', lane:'1', note:'Planning tool for choosing justice-centered phenomena'},
+  // Teacher Moves (green)
+  {id:'c7', text:'Wait Time (7+ seconds)', type:'move', lane:'3', note:'Creates space for all students to think, especially multilingual learners'},
+  {id:'c8', text:'Re-voicing student ideas', type:'move', lane:'2', note:'Honors and elevates student thinking publicly'},
+  {id:'c9', text:'"Say more about that..."', type:'move', lane:'3', note:'Keeps thinking open — does not converge too early'},
+  {id:'c10', text:'Pressing for mechanism (WHY)', type:'move', lane:'4', note:'Core Stage 4 move — moves from pattern to explanation'},
+  {id:'c11', text:'Making thinking visible', type:'move', lane:'3', note:'Whiteboards, drawings, public records'},
+  {id:'c12', text:'Harvesting disagreement', type:'move', lane:'3', note:'Uses conflicting student ideas as productive learning'},
+  // Lesson Types (orange)
+  {id:'c13', text:'Unit Planning Session', type:'lesson', lane:'1', note:'Backwards Design + AST starts here'},
+  {id:'c14', text:'Elicitation Lesson', type:'lesson', lane:'2', note:'Introduces phenomenon, draws out initial ideas'},
+  {id:'c15', text:'Sense-making Investigation', type:'lesson', lane:'3', note:'Students collect and analyze data'},
+  {id:'c16', text:'Final Model Revision', type:'lesson', lane:'4', note:'Students revise explanations using full unit evidence'},
+];
+
+let draggingId = null;
+let placements = {}; // cardId -> laneId
+
+function renderBank() {
+  const bank = document.getElementById('bank-cards');
+  const placed = Object.keys(placements);
+  bank.innerHTML = CARDS.filter(c => !placed.includes(c.id)).map(c => `
+    <div class="card ${c.type}" id="card-${c.id}" draggable="true"
+      ondragstart="startDrag(event,'${c.id}')">${c.text}</div>
+  `).join('');
+}
+
+function renderLanes() {
+  for (let l = 1; l <= 4; l++) {
+    const laneEl = document.getElementById('lane-' + l);
+    const cards = CARDS.filter(c => placements[c.id] === String(l));
+    if (!cards.length) {
+      laneEl.innerHTML = '<div class="empty-hint">Drag cards here</div>';
+    } else {
+      laneEl.innerHTML = cards.map(c => `
+        <div class="lane-card ${c.type}" draggable="true" id="lcard-${c.id}"
+          ondragstart="startDrag(event,'${c.id}')"
+          title="${c.note}">${c.text}</div>
+      `).join('');
+    }
+  }
+  document.getElementById('placed-count').textContent = Object.keys(placements).length;
+}
+
+function startDrag(e, id) {
+  draggingId = id;
+  setTimeout(() => {
+    const el = document.getElementById('card-' + id) || document.getElementById('lcard-' + id);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+function allowDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dropCard(e, laneId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (draggingId) {
+    placements[draggingId] = laneId;
+    draggingId = null;
+    renderBank();
+    renderLanes();
+  }
+}
+
+// Allow dropping back to bank
+document.addEventListener('dragover', e => e.preventDefault());
+
+function checkAnswers() {
+  let correct = 0;
+  const incorrectCards = [];
+  CARDS.forEach(c => {
+    if (placements[c.id] === c.lane) correct++;
+    else if (placements[c.id]) incorrectCards.push(c.text);
+  });
+  const total = Object.keys(placements).length;
+  const banner = document.getElementById('feedback-banner');
+  banner.style.display = 'block';
+  if (correct === CARDS.length) {
+    banner.className = 'feedback-banner correct';
+    banner.textContent = `✓ Perfect! All 16 cards in the correct lane. Notice how BPQs could fit in Stage 3 AND Stage 4 — discuss that ambiguity!`;
+  } else {
+    banner.className = 'feedback-banner partial';
+    banner.textContent = `${correct}/${total} placed correctly. Cards to reconsider: ${incorrectCards.slice(0,3).join(', ')}${incorrectCards.length > 3 ? '...' : ''}. Hover cards for hints!`;
+  }
+}
+
+function resetAll() {
+  placements = {};
+  document.getElementById('feedback-banner').style.display = 'none';
+  renderBank();
+  renderLanes();
+}
+
+// Init
+renderBank();
+renderLanes();
+</script>
+</body>
+</html>
